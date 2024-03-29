@@ -30,7 +30,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define RDF_EXTRA		0x0010		// Makro - refdefex_t to follow after refdef_t
 #define RDF_SUNLIGHT    0x0020      // SmileTheory - render sunlight and shadows
 
-typedef struct {
+typedef struct
+{
 	float			blurFactor;
 	float           sunDir[3];
 	float           sunCol[3];

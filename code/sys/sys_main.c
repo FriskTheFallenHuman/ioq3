@@ -32,13 +32,13 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include <errno.h>
 
 #ifndef DEDICATED
-#ifdef USE_LOCAL_HEADERS
-#	include "SDL.h"
-#	include "SDL_cpuinfo.h"
-#else
-#	include <SDL.h>
-#	include <SDL_cpuinfo.h>
-#endif
+	#ifdef USE_LOCAL_HEADERS
+		#include "SDL.h"
+		#include "SDL_cpuinfo.h"
+	#else
+		#include <SDL.h>
+		#include <SDL_cpuinfo.h>
+	#endif
 #endif
 
 #include "sys_local.h"
@@ -55,9 +55,9 @@ static char installPath[ MAX_OSPATH ] = { 0 };
 Sys_SetBinaryPath
 =================
 */
-void Sys_SetBinaryPath(const char *path)
+void Sys_SetBinaryPath( const char* path )
 {
-	Q_strncpyz(binaryPath, path, sizeof(binaryPath));
+	Q_strncpyz( binaryPath, path, sizeof( binaryPath ) );
 }
 
 /*
@@ -65,7 +65,7 @@ void Sys_SetBinaryPath(const char *path)
 Sys_BinaryPath
 =================
 */
-char *Sys_BinaryPath(void)
+char* Sys_BinaryPath( void )
 {
 	return binaryPath;
 }
@@ -75,9 +75,9 @@ char *Sys_BinaryPath(void)
 Sys_SetDefaultInstallPath
 =================
 */
-void Sys_SetDefaultInstallPath(const char *path)
+void Sys_SetDefaultInstallPath( const char* path )
 {
-	Q_strncpyz(installPath, path, sizeof(installPath));
+	Q_strncpyz( installPath, path, sizeof( installPath ) );
 }
 
 /*
@@ -85,12 +85,16 @@ void Sys_SetDefaultInstallPath(const char *path)
 Sys_DefaultInstallPath
 =================
 */
-char *Sys_DefaultInstallPath(void)
+char* Sys_DefaultInstallPath( void )
 {
-	if (*installPath)
+	if( *installPath )
+	{
 		return installPath;
+	}
 	else
+	{
 		return Sys_Cwd();
+	}
 }
 
 /*
@@ -98,7 +102,7 @@ char *Sys_DefaultInstallPath(void)
 Sys_DefaultAppPath
 =================
 */
-char *Sys_DefaultAppPath(void)
+char* Sys_DefaultAppPath( void )
 {
 	return Sys_BinaryPath();
 }
@@ -130,7 +134,7 @@ Sys_ConsoleInput
 Handle new console input
 =================
 */
-char *Sys_ConsoleInput(void)
+char* Sys_ConsoleInput( void )
 {
 	return CON_Input( );
 }
@@ -140,16 +144,18 @@ char *Sys_ConsoleInput(void)
 Sys_GetClipboardData
 ==================
 */
-char *Sys_GetClipboardData(void)
+char* Sys_GetClipboardData( void )
 {
 #ifdef DEDICATED
 	return NULL;
 #else
-	char *data = NULL;
-	char *cliptext;
+	char* data = NULL;
+	char* cliptext;
 
-	if ( ( cliptext = SDL_GetClipboardText() ) != NULL ) {
-		if ( cliptext[0] != '\0' ) {
+	if( ( cliptext = SDL_GetClipboardText() ) != NULL )
+	{
+		if( cliptext[0] != '\0' )
+		{
 			size_t bufsize = strlen( cliptext ) + 1;
 
 			data = Z_Malloc( bufsize );
@@ -165,9 +171,9 @@ char *Sys_GetClipboardData(void)
 }
 
 #ifdef DEDICATED
-#	define PID_FILENAME PRODUCT_NAME "_server.pid"
+	#define PID_FILENAME PRODUCT_NAME "_server.pid"
 #else
-#	define PID_FILENAME PRODUCT_NAME ".pid"
+	#define PID_FILENAME PRODUCT_NAME ".pid"
 #endif
 
 /*
@@ -175,12 +181,14 @@ char *Sys_GetClipboardData(void)
 Sys_PIDFileName
 =================
 */
-static char *Sys_PIDFileName( const char *gamedir )
+static char* Sys_PIDFileName( const char* gamedir )
 {
-	const char *homePath = Cvar_VariableString( "fs_homepath" );
+	const char* homePath = Cvar_VariableString( "fs_homepath" );
 
 	if( *homePath != '\0' )
+	{
 		return va( "%s/%s/%s", homePath, gamedir, PID_FILENAME );
+	}
 
 	return NULL;
 }
@@ -190,12 +198,14 @@ static char *Sys_PIDFileName( const char *gamedir )
 Sys_RemovePIDFile
 =================
 */
-void Sys_RemovePIDFile( const char *gamedir )
+void Sys_RemovePIDFile( const char* gamedir )
 {
-	char *pidFile = Sys_PIDFileName( gamedir );
+	char* pidFile = Sys_PIDFileName( gamedir );
 
 	if( pidFile != NULL )
+	{
 		remove( pidFile );
+	}
 }
 
 /*
@@ -205,14 +215,16 @@ Sys_WritePIDFile
 Return qtrue if there is an existing stale PID file
 =================
 */
-static qboolean Sys_WritePIDFile( const char *gamedir )
+static qboolean Sys_WritePIDFile( const char* gamedir )
 {
-	char      *pidFile = Sys_PIDFileName( gamedir );
-	FILE      *f;
+	char*      pidFile = Sys_PIDFileName( gamedir );
+	FILE*      f;
 	qboolean  stale = qfalse;
 
 	if( pidFile == NULL )
+	{
 		return qfalse;
+	}
 
 	// First, check if the pid file is already there
 	if( ( f = fopen( pidFile, "r" ) ) != NULL )
@@ -223,17 +235,22 @@ static qboolean Sys_WritePIDFile( const char *gamedir )
 		pid = fread( pidBuffer, sizeof( char ), sizeof( pidBuffer ) - 1, f );
 		fclose( f );
 
-		if(pid > 0)
+		if( pid > 0 )
 		{
 			pid = atoi( pidBuffer );
 			if( !Sys_PIDIsRunning( pid ) )
+			{
 				stale = qtrue;
+			}
 		}
 		else
+		{
 			stale = qtrue;
+		}
 	}
 
-	if( FS_CreatePath( pidFile ) ) {
+	if( FS_CreatePath( pidFile ) )
+	{
 		return 0;
 	}
 
@@ -243,7 +260,9 @@ static qboolean Sys_WritePIDFile( const char *gamedir )
 		fclose( f );
 	}
 	else
+	{
 		Com_Printf( S_COLOR_YELLOW "Couldn't write %s.\n", pidFile );
+	}
 
 	return stale;
 }
@@ -253,20 +272,23 @@ static qboolean Sys_WritePIDFile( const char *gamedir )
 Sys_InitPIDFile
 =================
 */
-void Sys_InitPIDFile( const char *gamedir ) {
-	if( Sys_WritePIDFile( gamedir ) ) {
+void Sys_InitPIDFile( const char* gamedir )
+{
+	if( Sys_WritePIDFile( gamedir ) )
+	{
 #ifndef DEDICATED
 		char message[1024];
 		char modName[MAX_OSPATH];
 
-		FS_GetModDescription( gamedir, modName, sizeof ( modName ) );
+		FS_GetModDescription( gamedir, modName, sizeof( modName ) );
 		Q_CleanStr( modName );
 
-		Com_sprintf( message, sizeof (message), "The last time %s ran, "
-			"it didn't exit properly. This may be due to inappropriate video "
-			"settings. Would you like to start with \"safe\" video settings?", modName );
+		Com_sprintf( message, sizeof( message ), "The last time %s ran, "
+					 "it didn't exit properly. This may be due to inappropriate video "
+					 "settings. Would you like to start with \"safe\" video settings?", modName );
 
-		if( Sys_Dialog( DT_YES_NO, message, "Abnormal Exit" ) == DR_YES ) {
+		if( Sys_Dialog( DT_YES_NO, message, "Abnormal Exit" ) == DR_YES )
+		{
 			Cvar_Set( "com_abnormalExit", "1" );
 		}
 #endif
@@ -280,7 +302,7 @@ Sys_Exit
 Single exit point (regular exit or in case of error)
 =================
 */
-static __attribute__ ((noreturn)) void Sys_Exit( int exitCode )
+static __attribute__( ( noreturn ) ) void Sys_Exit( int exitCode )
 {
 	CON_Shutdown( );
 
@@ -321,12 +343,30 @@ cpuFeatures_t Sys_GetProcessorFeatures( void )
 	cpuFeatures_t features = 0;
 
 #ifndef DEDICATED
-	if( SDL_HasRDTSC( ) )      features |= CF_RDTSC;
-	if( SDL_Has3DNow( ) )      features |= CF_3DNOW;
-	if( SDL_HasMMX( ) )        features |= CF_MMX;
-	if( SDL_HasSSE( ) )        features |= CF_SSE;
-	if( SDL_HasSSE2( ) )       features |= CF_SSE2;
-	if( SDL_HasAltiVec( ) )    features |= CF_ALTIVEC;
+	if( SDL_HasRDTSC( ) )
+	{
+		features |= CF_RDTSC;
+	}
+	if( SDL_Has3DNow( ) )
+	{
+		features |= CF_3DNOW;
+	}
+	if( SDL_HasMMX( ) )
+	{
+		features |= CF_MMX;
+	}
+	if( SDL_HasSSE( ) )
+	{
+		features |= CF_SSE;
+	}
+	if( SDL_HasSSE2( ) )
+	{
+		features |= CF_SSE2;
+	}
+	if( SDL_HasAltiVec( ) )
+	{
+		features |= CF_ALTIVEC;
+	}
 #endif
 
 	return features;
@@ -337,7 +377,7 @@ cpuFeatures_t Sys_GetProcessorFeatures( void )
 Sys_Init
 =================
 */
-void Sys_Init(void)
+void Sys_Init( void )
 {
 	Cmd_AddCommand( "in_restart", Sys_In_Restart_f );
 	Cvar_Set( "arch", OS_STRING " " ARCH_STRING );
@@ -351,7 +391,7 @@ Sys_AnsiColorPrint
 Transform Q3 colour codes to ANSI escape sequences
 =================
 */
-void Sys_AnsiColorPrint( const char *msg )
+void Sys_AnsiColorPrint( const char* msg )
 {
 	static char buffer[ MAXPRINTMSG ];
 	int         length = 0;
@@ -389,7 +429,7 @@ void Sys_AnsiColorPrint( const char *msg )
 			{
 				// Print the color code
 				Com_sprintf( buffer, sizeof( buffer ), "\033[%dm",
-						q3ToAnsi[ ColorIndex( *( msg + 1 ) ) ] );
+							 q3ToAnsi[ ColorIndex( *( msg + 1 ) ) ] );
 				fputs( buffer, stderr );
 				msg += 2;
 			}
@@ -397,7 +437,9 @@ void Sys_AnsiColorPrint( const char *msg )
 		else
 		{
 			if( length >= MAXPRINTMSG - 1 )
+			{
 				break;
+			}
 
 			buffer[ length ] = *msg;
 			length++;
@@ -418,7 +460,7 @@ void Sys_AnsiColorPrint( const char *msg )
 Sys_Print
 =================
 */
-void Sys_Print( const char *msg )
+void Sys_Print( const char* msg )
 {
 	CON_LogWrite( msg );
 	CON_Print( msg );
@@ -429,14 +471,14 @@ void Sys_Print( const char *msg )
 Sys_Error
 =================
 */
-void Sys_Error( const char *error, ... )
+void Sys_Error( const char* error, ... )
 {
 	va_list argptr;
 	char    string[1024];
 
-	va_start (argptr,error);
-	Q_vsnprintf (string, sizeof(string), error, argptr);
-	va_end (argptr);
+	va_start( argptr, error );
+	Q_vsnprintf( string, sizeof( string ), error, argptr );
+	va_end( argptr );
 
 	Sys_ErrorDialog( string );
 
@@ -449,14 +491,14 @@ void Sys_Error( const char *error, ... )
 Sys_Warn
 =================
 */
-static __attribute__ ((format (printf, 1, 2))) void Sys_Warn( char *warning, ... )
+static __attribute__( ( format( printf, 1, 2 ) ) ) void Sys_Warn( char* warning, ... )
 {
 	va_list argptr;
 	char    string[1024];
 
-	va_start (argptr,warning);
-	Q_vsnprintf (string, sizeof(string), warning, argptr);
-	va_end (argptr);
+	va_start( argptr, warning );
+	Q_vsnprintf( string, sizeof( string ), warning, argptr );
+	va_end( argptr );
 
 	CON_Print( va( "Warning: %s", string ) );
 }
@@ -469,12 +511,14 @@ Sys_FileTime
 returns -1 if not present
 ============
 */
-int Sys_FileTime( char *path )
+int Sys_FileTime( char* path )
 {
 	struct stat buf;
 
-	if (stat (path,&buf) == -1)
+	if( stat( path, &buf ) == -1 )
+	{
 		return -1;
+	}
 
 	return buf.st_mtime;
 }
@@ -484,15 +528,15 @@ int Sys_FileTime( char *path )
 Sys_UnloadDll
 =================
 */
-void Sys_UnloadDll( void *dllHandle )
+void Sys_UnloadDll( void* dllHandle )
 {
 	if( !dllHandle )
 	{
-		Com_Printf("Sys_UnloadDll(NULL)\n");
+		Com_Printf( "Sys_UnloadDll(NULL)\n" );
 		return;
 	}
 
-	Sys_UnloadLibrary(dllHandle);
+	Sys_UnloadLibrary( dllHandle );
 }
 
 /*
@@ -504,70 +548,76 @@ from executable path, then fs_basepath.
 =================
 */
 
-void *Sys_LoadDll(const char *name, qboolean useSystemLib)
+void* Sys_LoadDll( const char* name, qboolean useSystemLib )
 {
-	void *dllhandle = NULL;
+	void* dllhandle = NULL;
 
-	if(!Sys_DllExtension(name))
+	if( !Sys_DllExtension( name ) )
 	{
-		Com_Printf("Refusing to attempt to load library \"%s\": Extension not allowed.\n", name);
+		Com_Printf( "Refusing to attempt to load library \"%s\": Extension not allowed.\n", name );
 		return NULL;
 	}
 
-	if(useSystemLib)
+	if( useSystemLib )
 	{
-		Com_Printf("Trying to load \"%s\"...\n", name);
-		dllhandle = Sys_LoadLibrary(name);
+		Com_Printf( "Trying to load \"%s\"...\n", name );
+		dllhandle = Sys_LoadLibrary( name );
 	}
-	
-	if(!dllhandle)
+
+	if( !dllhandle )
 	{
-		const char *topDir;
+		const char* topDir;
 		char libPath[MAX_OSPATH];
 		int len;
 
 		topDir = Sys_BinaryPath();
 
-		if(!*topDir)
-			topDir = ".";
-
-		len = Com_sprintf(libPath, sizeof(libPath), "%s%c%s", topDir, PATH_SEP, name);
-		if(len < sizeof(libPath))
+		if( !*topDir )
 		{
-			Com_Printf("Trying to load \"%s\" from \"%s\"...\n", name, topDir);
-			dllhandle = Sys_LoadLibrary(libPath);
+			topDir = ".";
+		}
+
+		len = Com_sprintf( libPath, sizeof( libPath ), "%s%c%s", topDir, PATH_SEP, name );
+		if( len < sizeof( libPath ) )
+		{
+			Com_Printf( "Trying to load \"%s\" from \"%s\"...\n", name, topDir );
+			dllhandle = Sys_LoadLibrary( libPath );
 		}
 		else
 		{
-			Com_Printf("Skipping trying to load \"%s\" from \"%s\", file name is too long.\n", name, topDir);
+			Com_Printf( "Skipping trying to load \"%s\" from \"%s\", file name is too long.\n", name, topDir );
 		}
 
-		if(!dllhandle)
+		if( !dllhandle )
 		{
-			const char *basePath = Cvar_VariableString("fs_basepath");
-			
-			if(!basePath || !*basePath)
-				basePath = ".";
-			
-			if(FS_FilenameCompare(topDir, basePath))
+			const char* basePath = Cvar_VariableString( "fs_basepath" );
+
+			if( !basePath || !*basePath )
 			{
-				len = Com_sprintf(libPath, sizeof(libPath), "%s%c%s", basePath, PATH_SEP, name);
-				if(len < sizeof(libPath))
+				basePath = ".";
+			}
+
+			if( FS_FilenameCompare( topDir, basePath ) )
+			{
+				len = Com_sprintf( libPath, sizeof( libPath ), "%s%c%s", basePath, PATH_SEP, name );
+				if( len < sizeof( libPath ) )
 				{
-					Com_Printf("Trying to load \"%s\" from \"%s\"...\n", name, basePath);
-					dllhandle = Sys_LoadLibrary(libPath);
+					Com_Printf( "Trying to load \"%s\" from \"%s\"...\n", name, basePath );
+					dllhandle = Sys_LoadLibrary( libPath );
 				}
 				else
 				{
-					Com_Printf("Skipping trying to load \"%s\" from \"%s\", file name is too long.\n", name, basePath);
+					Com_Printf( "Skipping trying to load \"%s\" from \"%s\", file name is too long.\n", name, basePath );
 				}
 			}
-			
-			if(!dllhandle)
-				Com_Printf("Loading \"%s\" failed\n", name);
+
+			if( !dllhandle )
+			{
+				Com_Printf( "Loading \"%s\" failed\n", name );
+			}
 		}
 	}
-	
+
 	return dllhandle;
 }
 
@@ -578,42 +628,42 @@ Sys_LoadGameDll
 Used to load a development dll instead of a virtual machine
 =================
 */
-void *Sys_LoadGameDll(const char *name,
-	vmMainProc *entryPoint,
-	intptr_t (*systemcalls)(intptr_t, ...))
+void* Sys_LoadGameDll( const char* name,
+					   vmMainProc* entryPoint,
+					   intptr_t ( *systemcalls )( intptr_t, ... ) )
 {
-	void *libHandle;
-	void (*dllEntry)(intptr_t (*syscallptr)(intptr_t, ...));
+	void* libHandle;
+	void ( *dllEntry )( intptr_t ( *syscallptr )( intptr_t, ... ) );
 
-	assert(name);
+	assert( name );
 
-	if(!Sys_DllExtension(name))
+	if( !Sys_DllExtension( name ) )
 	{
-		Com_Printf("Refusing to attempt to load library \"%s\": Extension not allowed.\n", name);
+		Com_Printf( "Refusing to attempt to load library \"%s\": Extension not allowed.\n", name );
 		return NULL;
 	}
 
-	Com_Printf( "Loading DLL file: %s\n", name);
-	libHandle = Sys_LoadLibrary(name);
+	Com_Printf( "Loading DLL file: %s\n", name );
+	libHandle = Sys_LoadLibrary( name );
 
-	if(!libHandle)
+	if( !libHandle )
 	{
-		Com_Printf("Sys_LoadGameDll(%s) failed:\n\"%s\"\n", name, Sys_LibraryError());
+		Com_Printf( "Sys_LoadGameDll(%s) failed:\n\"%s\"\n", name, Sys_LibraryError() );
 		return NULL;
 	}
 
 	dllEntry = Sys_LoadFunction( libHandle, "dllEntry" );
 	*entryPoint = Sys_LoadFunction( libHandle, "vmMain" );
 
-	if ( !*entryPoint || !dllEntry )
+	if( !*entryPoint || !dllEntry )
 	{
-		Com_Printf ( "Sys_LoadGameDll(%s) failed to find vmMain function:\n\"%s\" !\n", name, Sys_LibraryError( ) );
-		Sys_UnloadLibrary(libHandle);
+		Com_Printf( "Sys_LoadGameDll(%s) failed to find vmMain function:\n\"%s\" !\n", name, Sys_LibraryError( ) );
+		Sys_UnloadLibrary( libHandle );
 
 		return NULL;
 	}
 
-	Com_Printf ( "Sys_LoadGameDll(%s) found vmMain function at %p\n", name, *entryPoint );
+	Com_Printf( "Sys_LoadGameDll(%s) found vmMain function at %p\n", name, *entryPoint );
 	dllEntry( systemcalls );
 
 	return libHandle;
@@ -624,7 +674,7 @@ void *Sys_LoadGameDll(const char *name,
 Sys_ParseArgs
 =================
 */
-void Sys_ParseArgs( int argc, char **argv )
+void Sys_ParseArgs( int argc, char** argv )
 {
 	if( argc == 2 )
 	{
@@ -653,29 +703,29 @@ operation is invalid or unsupported.
 At the moment only the "connect" command is supported.
 =================
 */
-char *Sys_ParseProtocolUri( const char *uri )
+char* Sys_ParseProtocolUri( const char* uri )
 {
 	// Both "quake3://" and "quake3:" can be used
-	if ( Q_strncmp( uri, PROTOCOL_HANDLER ":", strlen( PROTOCOL_HANDLER ":" ) ) )
+	if( Q_strncmp( uri, PROTOCOL_HANDLER ":", strlen( PROTOCOL_HANDLER ":" ) ) )
 	{
 		Com_Printf( "Sys_ParseProtocolUri: unsupported protocol.\n" );
 		return NULL;
 	}
 	uri += strlen( PROTOCOL_HANDLER ":" );
-	if ( !Q_strncmp( uri, "//", strlen( "//" ) ) )
+	if( !Q_strncmp( uri, "//", strlen( "//" ) ) )
 	{
 		uri += strlen( "//" );
 	}
 	Com_Printf( "Sys_ParseProtocolUri: %s\n", uri );
 
 	// At the moment, only "connect/hostname:port" is supported
-	if ( !Q_strncmp( uri, "connect/", strlen( "connect/" ) ) )
+	if( !Q_strncmp( uri, "connect/", strlen( "connect/" ) ) )
 	{
 		int i, bufsize;
-		char *out;
+		char* out;
 
 		uri += strlen( "connect/" );
-		if ( *uri == '\0' || *uri == '?' )
+		if( *uri == '\0' || *uri == '?' )
 		{
 			Com_Printf( "Sys_ParseProtocolUri: missing argument.\n" );
 			return NULL;
@@ -684,18 +734,18 @@ char *Sys_ParseProtocolUri( const char *uri )
 		// Check for any unsupported characters
 		// For safety reasons, the "hostname:port" part can only
 		// contain characters from: a-zA-Z0-9.:-[]
-		for ( i=0; uri[i] != '\0'; i++ )
+		for( i = 0; uri[i] != '\0'; i++ )
 		{
-			if ( uri[i] == '?' )
+			if( uri[i] == '?' )
 			{
 				// For forwards compatibility, any query string parameters are ignored (e.g. "?password=abcd")
 				// However, these are not passed on macOS, so it may be a bad idea to add them.
 				break;
 			}
 
-			if ( isalpha( uri[i] ) == 0 && isdigit( uri[i] ) == 0
-				&& uri[i] != '.' && uri[i] != ':' && uri[i] != '-'
-				&& uri[i] != '[' && uri[i] != ']' )
+			if( isalpha( uri[i] ) == 0 && isdigit( uri[i] ) == 0
+					&& uri[i] != '.' && uri[i] != ':' && uri[i] != '-'
+					&& uri[i] != '[' && uri[i] != ']' )
 			{
 				Com_Printf( "Sys_ParseProtocolUri: hostname contains unsupported character.\n" );
 				return NULL;
@@ -717,11 +767,11 @@ char *Sys_ParseProtocolUri( const char *uri )
 #endif
 
 #ifndef DEFAULT_BASEDIR
-#	ifdef __APPLE__
-#		define DEFAULT_BASEDIR Sys_StripAppBundle(Sys_BinaryPath())
-#	else
-#		define DEFAULT_BASEDIR Sys_BinaryPath()
-#	endif
+	#ifdef __APPLE__
+		#define DEFAULT_BASEDIR Sys_StripAppBundle(Sys_BinaryPath())
+	#else
+		#define DEFAULT_BASEDIR Sys_BinaryPath()
+	#endif
 #endif
 
 /*
@@ -736,23 +786,27 @@ void Sys_SigHandler( int signal )
 	if( signalcaught )
 	{
 		fprintf( stderr, "DOUBLE SIGNAL FAULT: Received signal %d, exiting...\n",
-			signal );
+				 signal );
 	}
 	else
 	{
 		signalcaught = qtrue;
 		VM_Forced_Unload_Start();
 #ifndef DEDICATED
-		CL_Shutdown(va("Received signal %d", signal), qtrue, qtrue);
+		CL_Shutdown( va( "Received signal %d", signal ), qtrue, qtrue );
 #endif
-		SV_Shutdown(va("Received signal %d", signal) );
+		SV_Shutdown( va( "Received signal %d", signal ) );
 		VM_Forced_Unload_Done();
 	}
 
 	if( signal == SIGTERM || signal == SIGINT )
+	{
 		Sys_Exit( 1 );
+	}
 	else
+	{
 		Sys_Exit( 2 );
+	}
 }
 
 /*
@@ -760,16 +814,16 @@ void Sys_SigHandler( int signal )
 main
 =================
 */
-int main( int argc, char **argv )
+int main( int argc, char** argv )
 {
 	int   i;
 	char  commandLine[ MAX_STRING_CHARS ] = { 0 };
 #ifdef PROTOCOL_HANDLER
-	char *protocolCommand = NULL;
+	char* protocolCommand = NULL;
 #endif
 
-	extern void Sys_LaunchAutoupdater(int argc, char **argv);
-	Sys_LaunchAutoupdater(argc, argv);
+	extern void Sys_LaunchAutoupdater( int argc, char** argv );
+	Sys_LaunchAutoupdater( argc, argv );
 
 #ifndef DEDICATED
 	// SDL version check
@@ -792,8 +846,8 @@ int main( int argc, char **argv )
 			SDL_VERSIONNUM( MINSDL_MAJOR, MINSDL_MINOR, MINSDL_PATCH ) )
 	{
 		Sys_Dialog( DT_ERROR, va( "SDL version " MINSDL_VERSION " or greater is required, "
-			"but only version %d.%d.%d was found. You may be able to obtain a more recent copy "
-			"from http://www.libsdl.org/.", ver.major, ver.minor, ver.patch ), "SDL Library Too Old" );
+								  "but only version %d.%d.%d was found. You may be able to obtain a more recent copy "
+								  "from http://www.libsdl.org/.", ver.major, ver.minor, ver.patch ), "SDL Library Too Old" );
 
 		Sys_Exit( 1 );
 	}
@@ -806,8 +860,10 @@ int main( int argc, char **argv )
 
 #ifdef __APPLE__
 	// This is passed if we are launched by double-clicking
-	if ( argc >= 2 && Q_strncmp ( argv[1], "-psn", 4 ) == 0 )
+	if( argc >= 2 && Q_strncmp( argv[1], "-psn", 4 ) == 0 )
+	{
 		argc = 1;
+	}
 #endif
 
 	Sys_ParseArgs( argc, argv );
@@ -821,31 +877,35 @@ int main( int argc, char **argv )
 
 		// For security reasons we always detect --uri, even when PROTOCOL_HANDLER is undefined
 		// Any arguments after "--uri quake3://..." is ignored
-		if ( !strcmp( argv[i], "--uri" ) )
+		if( !strcmp( argv[i], "--uri" ) )
 		{
 #ifdef PROTOCOL_HANDLER
-			if ( argc > i+1 )
+			if( argc > i + 1 )
 			{
-				protocolCommand = Sys_ParseProtocolUri( argv[i+1] );
+				protocolCommand = Sys_ParseProtocolUri( argv[i + 1] );
 			}
 #endif
 			break;
 		}
 
-		containsSpaces = strchr(argv[i], ' ') != NULL;
-		if (containsSpaces)
+		containsSpaces = strchr( argv[i], ' ' ) != NULL;
+		if( containsSpaces )
+		{
 			Q_strcat( commandLine, sizeof( commandLine ), "\"" );
+		}
 
 		Q_strcat( commandLine, sizeof( commandLine ), argv[ i ] );
 
-		if (containsSpaces)
+		if( containsSpaces )
+		{
 			Q_strcat( commandLine, sizeof( commandLine ), "\"" );
+		}
 
 		Q_strcat( commandLine, sizeof( commandLine ), " " );
 	}
 
 #ifdef PROTOCOL_HANDLER
-	if ( protocolCommand != NULL )
+	if( protocolCommand != NULL )
 	{
 		Q_strcat( commandLine, sizeof( commandLine ), "+" );
 		Q_strcat( commandLine, sizeof( commandLine ), protocolCommand );

@@ -67,41 +67,47 @@ Rankings_DrawText
 */
 void Rankings_DrawText( void* self )
 {
-	menufield_s		*f;
+	menufield_s*		f;
 	qboolean		focus;
 	int				style;
-	char			*txt;
+	char*			txt;
 	char			c;
-	float			*color;
+	float*			color;
 	int				basex, x, y;
 
-	f = (menufield_s*)self;
+	f = ( menufield_s* )self;
 	basex = f->generic.x;
 	y = f->generic.y + 4;
-	focus = (f->generic.parent->cursor == f->generic.menuPosition);
+	focus = ( f->generic.parent->cursor == f->generic.menuPosition );
 
-	style = UI_LEFT|UI_SMALLFONT;
+	style = UI_LEFT | UI_SMALLFONT;
 	color = text_color_normal;
-	if( focus ) {
+	if( focus )
+	{
 		style |= UI_PULSE;
 		color = text_color_highlight;
 	}
 
 	// draw the actual text
 	txt = f->field.buffer;
-	color = g_color_table[ColorIndex(COLOR_WHITE)];
+	color = g_color_table[ColorIndex( COLOR_WHITE )];
 	x = basex;
-	while ( (c = *txt) != 0 ) {
+	while( ( c = *txt ) != 0 )
+	{
 		UI_DrawChar( x, y, c, style, color );
 		txt++;
 		x += SMALLCHAR_WIDTH;
 	}
 
 	// draw cursor if we have focus
-	if( focus ) {
-		if ( trap_Key_GetOverstrikeMode() ) {
+	if( focus )
+	{
+		if( trap_Key_GetOverstrikeMode() )
+		{
 			c = 11;
-		} else {
+		}
+		else
+		{
 			c = 10;
 		}
 
@@ -119,29 +125,29 @@ Rankings_DrawName
 */
 void Rankings_DrawName( void* self )
 {
-	menufield_s		*f;
+	menufield_s*		f;
 	int				length;
 	char*			p;
-	
-	f = (menufield_s*)self;
+
+	f = ( menufield_s* )self;
 
 	// GRANK_FIXME - enforce valid characters
 	for( p = f->field.buffer; *p != '\0'; p++ )
 	{
 		//if( ispunct(*p) || isspace(*p) )
-		if( !( ( (*p) >= '0' && (*p) <= '9') || Q_isalpha(*p)) )
+		if( !( ( ( *p ) >= '0' && ( *p ) <= '9' ) || Q_isalpha( *p ) ) )
 		{
 			*p = '\0';
 		}
 	}
-	
+
 	// strip color codes
 	Q_CleanStr( f->field.buffer );
 	length = strlen( f->field.buffer );
 	if( f->field.cursor > length )
 	{
 		f->field.cursor = length;
-	}	
+	}
 
 	Rankings_DrawText( f );
 }
@@ -156,8 +162,8 @@ void Rankings_DrawName( void* self )
 {
 	menufield_s*	f;
 	int				length;
-	
-	f = (menufield_s*)self;
+
+	f = ( menufield_s* )self;
 
 	// strip color codes
 	Q_CleanStr( f->field.buffer );
@@ -166,7 +172,7 @@ void Rankings_DrawName( void* self )
 	{
 		f->field.cursor = length;
 	}
-	
+
 	// show beginning of long names
 	/*
 	if( Menu_ItemAtCursor( f->generic.parent ) != f )
@@ -178,7 +184,7 @@ void Rankings_DrawName( void* self )
 		}
 	}
 	*/
-	
+
 	MenuField_Draw( f );
 }
 #endif
@@ -196,26 +202,26 @@ void Rankings_DrawPassword( void* self )
 	int				i;
 	char*			p;
 
-	f = (menufield_s*)self;
-	
+	f = ( menufield_s* )self;
+
 	// GRANK_FIXME - enforce valid characters
 	for( p = f->field.buffer; *p != '\0'; p++ )
 	{
 		//if( ispunct(*p) || isspace(*p) )
-		if( !( ( (*p) >= '0' && (*p) <= '9') || Q_isalpha(*p)) )
+		if( !( ( ( *p ) >= '0' && ( *p ) <= '9' ) || Q_isalpha( *p ) ) )
 		{
 			*p = '\0';
 		}
 	}
-	
+
 	length = strlen( f->field.buffer );
 	if( f->field.cursor > length )
 	{
 		f->field.cursor = length;
 	}
-	
+
 	// save password
-	Q_strncpyz( password, f->field.buffer, sizeof(password) );
+	Q_strncpyz( password, f->field.buffer, sizeof( password ) );
 
 	// mask password with *
 	for( i = 0; i < length; i++ )
@@ -228,7 +234,7 @@ void Rankings_DrawPassword( void* self )
 	//MenuField_Draw( f );
 
 	// restore password
-	Q_strncpyz( f->field.buffer, password, sizeof(f->field.buffer) );
+	Q_strncpyz( f->field.buffer, password, sizeof( f->field.buffer ) );
 }
 
 /*
@@ -236,39 +242,42 @@ void Rankings_DrawPassword( void* self )
 Rankings_MenuEvent
 ===============
 */
-static void Rankings_MenuEvent( void* ptr, int event ) {
-	if( event != QM_ACTIVATED ) {
+static void Rankings_MenuEvent( void* ptr, int event )
+{
+	if( event != QM_ACTIVATED )
+	{
 		return;
 	}
 
-	switch( ((menucommon_s*)ptr)->id ) {
-	case ID_LOGIN:
-		UI_LoginMenu();
-		break;
+	switch( ( ( menucommon_s* )ptr )->id )
+	{
+		case ID_LOGIN:
+			UI_LoginMenu();
+			break;
 
-	case ID_LOGOUT:
-		// server side masqueraded player logout first
-		trap_CL_UI_RankUserRequestLogout();
-		UI_ForceMenuOff();
-		break;
-		
-	case ID_CREATE:
-		UI_SignupMenu();
-		break;
+		case ID_LOGOUT:
+			// server side masqueraded player logout first
+			trap_CL_UI_RankUserRequestLogout();
+			UI_ForceMenuOff();
+			break;
 
-	case ID_SPECTATE:
-		trap_Cmd_ExecuteText( EXEC_APPEND, "cmd rank_spectate\n" );
-		UI_ForceMenuOff();
-		break;
+		case ID_CREATE:
+			UI_SignupMenu();
+			break;
 
-	case ID_SETUP:
-		UI_SetupMenu();
-		break;
-		
-	case ID_LEAVE:
-		trap_Cmd_ExecuteText( EXEC_APPEND, "disconnect\n" );
-		UI_ForceMenuOff();
-		break;
+		case ID_SPECTATE:
+			trap_Cmd_ExecuteText( EXEC_APPEND, "cmd rank_spectate\n" );
+			UI_ForceMenuOff();
+			break;
+
+		case ID_SETUP:
+			UI_SetupMenu();
+			break;
+
+		case ID_LEAVE:
+			trap_Cmd_ExecuteText( EXEC_APPEND, "disconnect\n" );
+			UI_ForceMenuOff();
+			break;
 
 	}
 }
@@ -279,11 +288,12 @@ static void Rankings_MenuEvent( void* ptr, int event ) {
 Rankings_MenuInit
 ===============
 */
-void Rankings_MenuInit( void ) {
+void Rankings_MenuInit( void )
+{
 	grank_status_t	status;
 	int				y;
 
-	memset( &s_rankings, 0, sizeof(s_rankings) );
+	memset( &s_rankings, 0, sizeof( s_rankings ) );
 
 	Rankings_Cache();
 
@@ -301,99 +311,99 @@ void Rankings_MenuInit( void ) {
 	y = 194;
 
 	s_rankings.login.generic.type		= MTYPE_PTEXT;
-	s_rankings.login.generic.flags		= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
+	s_rankings.login.generic.flags		= QMF_CENTER_JUSTIFY | QMF_PULSEIFFOCUS;
 	s_rankings.login.generic.id			= ID_LOGIN;
 	s_rankings.login.generic.callback	= Rankings_MenuEvent;
 	s_rankings.login.generic.x			= 320;
 	s_rankings.login.generic.y			= y;
 	s_rankings.login.string				= "LOGIN";
-	s_rankings.login.style				= UI_CENTER|UI_SMALLFONT;
+	s_rankings.login.style				= UI_CENTER | UI_SMALLFONT;
 	s_rankings.login.color				= colorRed;
 	y += 20;
 
 	s_rankings.logout.generic.type		= MTYPE_PTEXT;
-	s_rankings.logout.generic.flags		= QMF_HIDDEN|QMF_INACTIVE|QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
+	s_rankings.logout.generic.flags		= QMF_HIDDEN | QMF_INACTIVE | QMF_CENTER_JUSTIFY | QMF_PULSEIFFOCUS;
 	s_rankings.logout.generic.id		= ID_LOGOUT;
 	s_rankings.logout.generic.callback	= Rankings_MenuEvent;
 	s_rankings.logout.generic.x			= 320;
 	s_rankings.logout.generic.y			= y;
 	s_rankings.logout.string				= "LOGOUT";
-	s_rankings.logout.style				= UI_CENTER|UI_SMALLFONT;
+	s_rankings.logout.style				= UI_CENTER | UI_SMALLFONT;
 	s_rankings.logout.color				= colorRed;
 
 	s_rankings.create.generic.type		= MTYPE_PTEXT;
-	s_rankings.create.generic.flags		= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
+	s_rankings.create.generic.flags		= QMF_CENTER_JUSTIFY | QMF_PULSEIFFOCUS;
 	s_rankings.create.generic.id		= ID_CREATE;
 	s_rankings.create.generic.callback	= Rankings_MenuEvent;
 	s_rankings.create.generic.x			= 320;
 	s_rankings.create.generic.y			= y;
 	s_rankings.create.string			= "SIGN UP";
-	s_rankings.create.style				= UI_CENTER|UI_SMALLFONT;
+	s_rankings.create.style				= UI_CENTER | UI_SMALLFONT;
 	s_rankings.create.color				= colorRed;
 	y += 20;
 
 	s_rankings.spectate.generic.type		= MTYPE_PTEXT;
-	s_rankings.spectate.generic.flags		= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
+	s_rankings.spectate.generic.flags		= QMF_CENTER_JUSTIFY | QMF_PULSEIFFOCUS;
 	s_rankings.spectate.generic.id			= ID_SPECTATE;
 	s_rankings.spectate.generic.callback	= Rankings_MenuEvent;
 	s_rankings.spectate.generic.x			= 320;
 	s_rankings.spectate.generic.y			= y;
 	s_rankings.spectate.string				= "SPECTATE";
-	s_rankings.spectate.style				= UI_CENTER|UI_SMALLFONT;
+	s_rankings.spectate.style				= UI_CENTER | UI_SMALLFONT;
 	s_rankings.spectate.color				= colorRed;
 	y += 20;
 
 	s_rankings.setup.generic.type		= MTYPE_PTEXT;
-	s_rankings.setup.generic.flags		= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
+	s_rankings.setup.generic.flags		= QMF_CENTER_JUSTIFY | QMF_PULSEIFFOCUS;
 	s_rankings.setup.generic.id			= ID_SETUP;
 	s_rankings.setup.generic.callback	= Rankings_MenuEvent;
 	s_rankings.setup.generic.x			= 320;
 	s_rankings.setup.generic.y			= y;
 	s_rankings.setup.string				= "SETUP";
-	s_rankings.setup.style				= UI_CENTER|UI_SMALLFONT;
+	s_rankings.setup.style				= UI_CENTER | UI_SMALLFONT;
 	s_rankings.setup.color				= colorRed;
 	y += 20;
 
 	s_rankings.leave.generic.type		= MTYPE_PTEXT;
-	s_rankings.leave.generic.flags		= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
+	s_rankings.leave.generic.flags		= QMF_CENTER_JUSTIFY | QMF_PULSEIFFOCUS;
 	s_rankings.leave.generic.id			= ID_LEAVE;
 	s_rankings.leave.generic.callback	= Rankings_MenuEvent;
 	s_rankings.leave.generic.x			= 320;
 	s_rankings.leave.generic.y			= y;
 	s_rankings.leave.string				= "LEAVE ARENA";
-	s_rankings.leave.style				= UI_CENTER|UI_SMALLFONT;
+	s_rankings.leave.style				= UI_CENTER | UI_SMALLFONT;
 	s_rankings.leave.color				= colorRed;
 	y += 20;
 
-	status = (grank_status_t)trap_Cvar_VariableValue("client_status");
-	if( (status != QGR_STATUS_NEW) && (status != QGR_STATUS_SPECTATOR) )
+	status = ( grank_status_t )trap_Cvar_VariableValue( "client_status" );
+	if( ( status != QGR_STATUS_NEW ) && ( status != QGR_STATUS_SPECTATOR ) )
 	{
-		s_rankings.login.generic.flags |= QMF_HIDDEN | QMF_INACTIVE;	
+		s_rankings.login.generic.flags |= QMF_HIDDEN | QMF_INACTIVE;
 		s_rankings.create.generic.flags |= QMF_HIDDEN | QMF_INACTIVE;
 		s_rankings.spectate.generic.flags |= QMF_HIDDEN | QMF_INACTIVE;
 
-		s_rankings.logout.generic.flags &= ~(QMF_HIDDEN | QMF_INACTIVE);
+		s_rankings.logout.generic.flags &= ~( QMF_HIDDEN | QMF_INACTIVE );
 	}
-	
-	if ( (status == QGR_STATUS_VALIDATING) ||
-		 (status == QGR_STATUS_PENDING) ||
-		 (status == QGR_STATUS_LEAVING) )
+
+	if( ( status == QGR_STATUS_VALIDATING ) ||
+			( status == QGR_STATUS_PENDING ) ||
+			( status == QGR_STATUS_LEAVING ) )
 	{
 		s_rankings.login.generic.flags  |= QMF_GRAYED;
 		s_rankings.create.generic.flags |= QMF_GRAYED;
 		s_rankings.logout.generic.flags |= QMF_GRAYED;
 	}
-	
+
 	//GRank FIXME -- don't need setup option any more
 	s_rankings.setup.generic.flags |= QMF_HIDDEN | QMF_INACTIVE;
 
-	Menu_AddItem( &s_rankings.menu, (void*) &s_rankings.frame );
-	Menu_AddItem( &s_rankings.menu, (void*) &s_rankings.login );
-	Menu_AddItem( &s_rankings.menu, (void*) &s_rankings.logout );
-	Menu_AddItem( &s_rankings.menu, (void*) &s_rankings.create );
-	Menu_AddItem( &s_rankings.menu, (void*) &s_rankings.spectate );
-	Menu_AddItem( &s_rankings.menu, (void*) &s_rankings.setup );
-	Menu_AddItem( &s_rankings.menu, (void*) &s_rankings.leave );
+	Menu_AddItem( &s_rankings.menu, ( void* ) &s_rankings.frame );
+	Menu_AddItem( &s_rankings.menu, ( void* ) &s_rankings.login );
+	Menu_AddItem( &s_rankings.menu, ( void* ) &s_rankings.logout );
+	Menu_AddItem( &s_rankings.menu, ( void* ) &s_rankings.create );
+	Menu_AddItem( &s_rankings.menu, ( void* ) &s_rankings.spectate );
+	Menu_AddItem( &s_rankings.menu, ( void* ) &s_rankings.setup );
+	Menu_AddItem( &s_rankings.menu, ( void* ) &s_rankings.leave );
 }
 
 
@@ -402,7 +412,8 @@ void Rankings_MenuInit( void ) {
 Rankings_Cache
 ===============
 */
-void Rankings_Cache( void ) {
+void Rankings_Cache( void )
+{
 	trap_R_RegisterShaderNoMip( RANKINGS_FRAME );
 }
 
@@ -412,9 +423,10 @@ void Rankings_Cache( void ) {
 UI_RankingsMenu
 ===============
 */
-void UI_RankingsMenu( void ) {
+void UI_RankingsMenu( void )
+{
 	Rankings_MenuInit();
-	UI_PushMenu ( &s_rankings.menu );
+	UI_PushMenu( &s_rankings.menu );
 }
 
 

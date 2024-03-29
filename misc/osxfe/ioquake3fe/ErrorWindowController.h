@@ -9,7 +9,8 @@
 #import <Cocoa/Cocoa.h>
 
 
-@interface ErrorWindowController : NSWindowController {
+@interface ErrorWindowController : NSWindowController
+{
 
 }
 

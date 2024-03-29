@@ -86,15 +86,16 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define	CS_SOUNDS				(CS_MODELS+MAX_MODELS)
 #define	CS_PLAYERS				(CS_SOUNDS+MAX_SOUNDS)
 #define CS_LOCATIONS			(CS_PLAYERS+MAX_CLIENTS)
-#define CS_PARTICLES			(CS_LOCATIONS+MAX_LOCATIONS) 
+#define CS_PARTICLES			(CS_LOCATIONS+MAX_LOCATIONS)
 
 #define CS_MAX					(CS_PARTICLES+MAX_LOCATIONS)
 
 #if (CS_MAX) > MAX_CONFIGSTRINGS
-#error overflow: (CS_MAX) > MAX_CONFIGSTRINGS
+	#error overflow: (CS_MAX) > MAX_CONFIGSTRINGS
 #endif
 
-typedef enum {
+typedef enum
+{
 	GT_FFA,				// free for all
 	GT_TOURNAMENT,		// one on one tournament
 	GT_SINGLE_PLAYER,	// single player ffa
@@ -122,7 +123,8 @@ movement on the server game.
 ===================================================================================
 */
 
-typedef enum {
+typedef enum
+{
 	PM_NORMAL,		// can accelerate and turn
 	PM_NOCLIP,		// noclip movement
 	PM_SPECTATOR,	// still run into walls
@@ -132,8 +134,9 @@ typedef enum {
 	PM_SPINTERMISSION	// no movement or status bar
 } pmtype_t;
 
-typedef enum {
-	WEAPON_READY, 
+typedef enum
+{
+	WEAPON_READY,
 	WEAPON_RAISING,
 	WEAPON_DROPPING,
 	WEAPON_FIRING
@@ -157,9 +160,10 @@ typedef enum {
 #define	PMF_ALL_TIMES	(PMF_TIME_WATERJUMP|PMF_TIME_LAND|PMF_TIME_KNOCKBACK)
 
 #define	MAXTOUCH	32
-typedef struct {
+typedef struct
+{
 	// state (in / out)
-	playerState_t	*ps;
+	playerState_t*	ps;
 
 	// command (in)
 	usercmd_t	cmd;
@@ -187,27 +191,28 @@ typedef struct {
 
 	// callbacks to test the world
 	// these will be different functions during game and cgame
-	void		(*trace)( trace_t *results, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int passEntityNum, int contentMask );
-	int			(*pointcontents)( const vec3_t point, int passEntityNum );
+	void	( *trace )( trace_t* results, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int passEntityNum, int contentMask );
+	int	( *pointcontents )( const vec3_t point, int passEntityNum );
 } pmove_t;
 
 // if a full pmove isn't done on the client, you can just update the angles
-void PM_UpdateViewAngles( playerState_t *ps, const usercmd_t *cmd );
-void Pmove (pmove_t *pmove);
+void PM_UpdateViewAngles( playerState_t* ps, const usercmd_t* cmd );
+void Pmove( pmove_t* pmove );
 
 //===================================================================================
 
 
 // player_state->stats[] indexes
 // NOTE: may not have more than 16
-typedef enum {
+typedef enum
+{
 	STAT_HEALTH,
 	STAT_HOLDABLE_ITEM,
 #ifdef MISSIONPACK
 	STAT_PERSISTANT_POWERUP,
 #endif
 	STAT_WEAPONS,					// 16 bit fields
-	STAT_ARMOR,				
+	STAT_ARMOR,
 	STAT_DEAD_YAW,					// look this direction when dead (FIXME: get rid of?)
 	STAT_CLIENTS_READY,				// bit mask of clients wishing to exit the intermission (FIXME: configstring?)
 	STAT_MAX_HEALTH					// health / armor limit, changeable by handicap
@@ -218,7 +223,8 @@ typedef enum {
 // these fields are the only part of player_state that isn't
 // cleared on respawn
 // NOTE: may not have more than 16
-typedef enum {
+typedef enum
+{
 	PERS_SCORE,						// !!! MUST NOT CHANGE, SERVER AND GAME BOTH REFERENCE !!!
 	PERS_HITS,						// total points damage inflicted so damage beeps can sound on change
 	PERS_RANK,						// player rank or team rank
@@ -241,7 +247,7 @@ typedef enum {
 // entityState_t->eFlags
 #define	EF_DEAD				0x00000001		// don't draw a foe marker over players with EF_DEAD
 #ifdef MISSIONPACK
-#define EF_TICKING			0x00000002		// used to make players play the prox mine ticking sound
+	#define EF_TICKING			0x00000002		// used to make players play the prox mine ticking sound
 #endif
 #define	EF_TELEPORT_BIT		0x00000004		// toggled every time the origin abruptly changes
 #define	EF_AWARD_EXCELLENT	0x00000008		// draw an excellent sprite
@@ -264,7 +270,8 @@ typedef enum {
 #define EF_TEAMVOTED		0x00080000		// already cast a team vote
 
 // NOTE: may not have more than 16
-typedef enum {
+typedef enum
+{
 	PW_NONE,
 
 	PW_QUAD,
@@ -288,7 +295,8 @@ typedef enum {
 
 } powerup_t;
 
-typedef enum {
+typedef enum
+{
 	HI_NONE,
 
 	HI_TELEPORTER,
@@ -301,7 +309,8 @@ typedef enum {
 } holdable_t;
 
 
-typedef enum {
+typedef enum
+{
 	WP_NONE,
 
 	WP_GAUNTLET,
@@ -344,7 +353,8 @@ typedef enum {
 
 #define	EVENT_VALID_MSEC	300
 
-typedef enum {
+typedef enum
+{
 	EV_NONE,
 
 	EV_FOOTSTEP,
@@ -452,7 +462,8 @@ typedef enum {
 } entity_event_t;
 
 
-typedef enum {
+typedef enum
+{
 	GTS_RED_CAPTURE,
 	GTS_BLUE_CAPTURE,
 	GTS_RED_RETURN,
@@ -470,7 +481,8 @@ typedef enum {
 } global_team_sound_t;
 
 // animations
-typedef enum {
+typedef enum
+{
 	BOTH_DEATH1,
 	BOTH_DEAD1,
 	BOTH_DEATH2,
@@ -525,7 +537,8 @@ typedef enum {
 } animNumber_t;
 
 
-typedef struct animation_s {
+typedef struct animation_s
+{
 	int		firstFrame;
 	int		numFrames;
 	int		loopFrames;			// 0 to numFrames
@@ -541,7 +554,8 @@ typedef struct animation_s {
 #define	ANIM_TOGGLEBIT		128
 
 
-typedef enum {
+typedef enum
+{
 	TEAM_FREE,
 	TEAM_RED,
 	TEAM_BLUE,
@@ -557,9 +571,10 @@ typedef enum {
 #define TEAM_MAXOVERLAY		32
 
 //team task
-typedef enum {
+typedef enum
+{
 	TEAMTASK_NONE,
-	TEAMTASK_OFFENSE, 
+	TEAMTASK_OFFENSE,
 	TEAMTASK_DEFENSE,
 	TEAMTASK_PATROL,
 	TEAMTASK_FOLLOW,
@@ -569,7 +584,8 @@ typedef enum {
 } teamtask_t;
 
 // means of death
-typedef enum {
+typedef enum
+{
 	MOD_UNKNOWN,
 	MOD_SHOTGUN,
 	MOD_GAUNTLET,
@@ -607,50 +623,52 @@ typedef enum {
 //---------------------------------------------------------
 
 // gitem_t->type
-typedef enum {
+typedef enum
+{
 	IT_BAD,
 	IT_WEAPON,				// EFX: rotate + upscale + minlight
 	IT_AMMO,				// EFX: rotate
 	IT_ARMOR,				// EFX: rotate + minlight
 	IT_HEALTH,				// EFX: static external sphere + rotating internal
 	IT_POWERUP,				// instant on, timer based
-							// EFX: rotate + external ring that rotates
+	// EFX: rotate + external ring that rotates
 	IT_HOLDABLE,			// single use, holdable item
-							// EFX: rotate + bob
+	// EFX: rotate + bob
 	IT_PERSISTANT_POWERUP,
 	IT_TEAM
 } itemType_t;
 
 #define MAX_ITEM_MODELS 4
 
-typedef struct gitem_s {
-	char		*classname;	// spawning name
-	char		*pickup_sound;
-	char		*world_model[MAX_ITEM_MODELS];
+typedef struct gitem_s
+{
+	char*		classname;	// spawning name
+	char*		pickup_sound;
+	char*		world_model[MAX_ITEM_MODELS];
 
-	char		*icon;
-	char		*pickup_name;	// for printing on pickup
+	char*		icon;
+	char*		pickup_name;	// for printing on pickup
 
 	int			quantity;		// for ammo how much, or duration of powerup
 	itemType_t  giType;			// IT_* flags
 
 	int			giTag;
 
-	char		*precaches;		// string of all models and images this item will use
-	char		*sounds;		// string of all sounds this item will use
+	char*		precaches;		// string of all models and images this item will use
+	char*		sounds;		// string of all sounds this item will use
 } gitem_t;
 
 // included in both the game dll and the client
 extern	gitem_t	bg_itemlist[];
 extern	int		bg_numItems;
 
-gitem_t	*BG_FindItem( const char *pickupName );
-gitem_t	*BG_FindItemForWeapon( weapon_t weapon );
-gitem_t	*BG_FindItemForPowerup( powerup_t pw );
-gitem_t	*BG_FindItemForHoldable( holdable_t pw );
+gitem_t*	BG_FindItem( const char* pickupName );
+gitem_t*	BG_FindItemForWeapon( weapon_t weapon );
+gitem_t*	BG_FindItemForPowerup( powerup_t pw );
+gitem_t*	BG_FindItemForHoldable( holdable_t pw );
 #define	ITEM_INDEX(x) ((x)-bg_itemlist)
 
-qboolean	BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const playerState_t *ps );
+qboolean	BG_CanItemBeGrabbed( int gametype, const entityState_t* ent, const playerState_t* ps );
 
 
 // g_dmflags->integer flags
@@ -671,7 +689,8 @@ qboolean	BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const play
 //
 // entityState_t->eType
 //
-typedef enum {
+typedef enum
+{
 	ET_GENERAL,
 	ET_PLAYER,
 	ET_ITEM,
@@ -687,23 +706,23 @@ typedef enum {
 	ET_TEAM,
 
 	ET_EVENTS				// any of the EV_* events can be added freestanding
-							// by setting eType to ET_EVENTS + eventNum
-							// this avoids having to set eFlags and eventNum
+	// by setting eType to ET_EVENTS + eventNum
+	// this avoids having to set eFlags and eventNum
 } entityType_t;
 
 
 
-void	BG_EvaluateTrajectory( const trajectory_t *tr, int atTime, vec3_t result );
-void	BG_EvaluateTrajectoryDelta( const trajectory_t *tr, int atTime, vec3_t result );
+void	BG_EvaluateTrajectory( const trajectory_t* tr, int atTime, vec3_t result );
+void	BG_EvaluateTrajectoryDelta( const trajectory_t* tr, int atTime, vec3_t result );
 
-void	BG_AddPredictableEventToPlayerstate( int newEvent, int eventParm, playerState_t *ps );
+void	BG_AddPredictableEventToPlayerstate( int newEvent, int eventParm, playerState_t* ps );
 
-void	BG_TouchJumpPad( playerState_t *ps, entityState_t *jumppad );
+void	BG_TouchJumpPad( playerState_t* ps, entityState_t* jumppad );
 
-void	BG_PlayerStateToEntityState( playerState_t *ps, entityState_t *s, qboolean snap );
-void	BG_PlayerStateToEntityStateExtraPolate( playerState_t *ps, entityState_t *s, int time, qboolean snap );
+void	BG_PlayerStateToEntityState( playerState_t* ps, entityState_t* s, qboolean snap );
+void	BG_PlayerStateToEntityStateExtraPolate( playerState_t* ps, entityState_t* s, int time, qboolean snap );
 
-qboolean	BG_PlayerTouchesItem( playerState_t *ps, entityState_t *item, int atTime );
+qboolean	BG_PlayerTouchesItem( playerState_t* ps, entityState_t* item, int atTime );
 
 
 #define ARENAS_PER_TIER		4

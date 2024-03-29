@@ -40,46 +40,48 @@ This is the only way control passes into the module.
 This must be the very first function compiled into the .qvm file
 ================
 */
-Q_EXPORT intptr_t vmMain( int command, int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8, int arg9, int arg10, int arg11  ) {
-	switch ( command ) {
-	case UI_GETAPIVERSION:
-		return UI_API_VERSION;
+Q_EXPORT intptr_t vmMain( int command, int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8, int arg9, int arg10, int arg11 )
+{
+	switch( command )
+	{
+		case UI_GETAPIVERSION:
+			return UI_API_VERSION;
 
-	case UI_INIT:
-		UI_Init();
-		return 0;
+		case UI_INIT:
+			UI_Init();
+			return 0;
 
-	case UI_SHUTDOWN:
-		UI_Shutdown();
-		return 0;
+		case UI_SHUTDOWN:
+			UI_Shutdown();
+			return 0;
 
-	case UI_KEY_EVENT:
-		UI_KeyEvent( arg0, arg1 );
-		return 0;
+		case UI_KEY_EVENT:
+			UI_KeyEvent( arg0, arg1 );
+			return 0;
 
-	case UI_MOUSE_EVENT:
-		UI_MouseEvent( arg0, arg1 );
-		return 0;
+		case UI_MOUSE_EVENT:
+			UI_MouseEvent( arg0, arg1 );
+			return 0;
 
-	case UI_REFRESH:
-		UI_Refresh( arg0 );
-		return 0;
+		case UI_REFRESH:
+			UI_Refresh( arg0 );
+			return 0;
 
-	case UI_IS_FULLSCREEN:
-		return UI_IsFullscreen();
+		case UI_IS_FULLSCREEN:
+			return UI_IsFullscreen();
 
-	case UI_SET_ACTIVE_MENU:
-		UI_SetActiveMenu( arg0 );
-		return 0;
+		case UI_SET_ACTIVE_MENU:
+			UI_SetActiveMenu( arg0 );
+			return 0;
 
-	case UI_CONSOLE_COMMAND:
-		return UI_ConsoleCommand(arg0);
+		case UI_CONSOLE_COMMAND:
+			return UI_ConsoleCommand( arg0 );
 
-	case UI_DRAW_CONNECT_SCREEN:
-		UI_DrawConnectScreen( arg0 );
-		return 0;
-	case UI_HASUNIQUECDKEY:				// mod authors need to observe this
-		return qtrue;  // change this to qfalse for mods!
+		case UI_DRAW_CONNECT_SCREEN:
+			UI_DrawConnectScreen( arg0 );
+			return 0;
+		case UI_HASUNIQUECDKEY:				// mod authors need to observe this
+			return qtrue;  // change this to qfalse for mods!
 	}
 
 	return -1;
@@ -92,10 +94,11 @@ cvars
 ================
 */
 
-typedef struct {
-	vmCvar_t	*vmCvar;
-	char		*cvarName;
-	char		*defaultString;
+typedef struct
+{
+	vmCvar_t*	vmCvar;
+	char*		cvarName;
+	char*		defaultString;
 	int			cvarFlags;
 } cvarTable_t;
 
@@ -157,7 +160,8 @@ vmCvar_t	ui_server16;
 vmCvar_t	ui_cdkeychecked;
 vmCvar_t	ui_ioq3;
 
-static cvarTable_t		cvarTable[] = {
+static cvarTable_t		cvarTable[] =
+{
 	{ &ui_ffa_fraglimit, "ui_ffa_fraglimit", "20", CVAR_ARCHIVE },
 	{ &ui_ffa_timelimit, "ui_ffa_timelimit", "0", CVAR_ARCHIVE },
 
@@ -172,8 +176,8 @@ static cvarTable_t		cvarTable[] = {
 	{ &ui_ctf_timelimit, "ui_ctf_timelimit", "30", CVAR_ARCHIVE },
 	{ &ui_ctf_friendly, "ui_ctf_friendly",  "0", CVAR_ARCHIVE },
 
-	{ &ui_arenasFile, "g_arenasFile", "", CVAR_INIT|CVAR_ROM },
-	{ &ui_botsFile, "g_botsFile", "", CVAR_INIT|CVAR_ROM },
+	{ &ui_arenasFile, "g_arenasFile", "", CVAR_INIT | CVAR_ROM },
+	{ &ui_botsFile, "g_botsFile", "", CVAR_INIT | CVAR_ROM },
 	{ &ui_spScores1, "g_spScores1", "", CVAR_ARCHIVE },
 	{ &ui_spScores2, "g_spScores2", "", CVAR_ARCHIVE },
 	{ &ui_spScores3, "g_spScores3", "", CVAR_ARCHIVE },
@@ -226,11 +230,13 @@ static int cvarTableSize = ARRAY_LEN( cvarTable );
 UI_RegisterCvars
 =================
 */
-void UI_RegisterCvars( void ) {
+void UI_RegisterCvars( void )
+{
 	int			i;
-	cvarTable_t	*cv;
+	cvarTable_t*	cv;
 
-	for ( i = 0, cv = cvarTable ; i < cvarTableSize ; i++, cv++ ) {
+	for( i = 0, cv = cvarTable ; i < cvarTableSize ; i++, cv++ )
+	{
 		trap_Cvar_Register( cv->vmCvar, cv->cvarName, cv->defaultString, cv->cvarFlags );
 	}
 }
@@ -240,12 +246,15 @@ void UI_RegisterCvars( void ) {
 UI_UpdateCvars
 =================
 */
-void UI_UpdateCvars( void ) {
+void UI_UpdateCvars( void )
+{
 	int			i;
-	cvarTable_t	*cv;
+	cvarTable_t*	cv;
 
-	for ( i = 0, cv = cvarTable ; i < cvarTableSize ; i++, cv++ ) {
-		if ( !cv->vmCvar ) {
+	for( i = 0, cv = cvarTable ; i < cvarTableSize ; i++, cv++ )
+	{
+		if( !cv->vmCvar )
+		{
 			continue;
 		}
 

@@ -38,9 +38,13 @@ CON_LogSize
 unsigned int CON_LogSize( void )
 {
 	if( readPos <= writePos )
+	{
 		return writePos - readPos;
+	}
 	else
+	{
 		return writePos + MAX_LOG - readPos;
+	}
 }
 
 /*
@@ -58,7 +62,7 @@ static unsigned int CON_LogFree( void )
 CON_LogWrite
 ==================
 */
-unsigned int CON_LogWrite( const char *in )
+unsigned int CON_LogWrite( const char* in )
 {
 	unsigned int length = strlen( in );
 	unsigned int firstChunk;
@@ -68,14 +72,18 @@ unsigned int CON_LogWrite( const char *in )
 	{
 		// Free enough space
 		while( consoleLog[ readPos ] != '\n' && CON_LogSize( ) > 1 )
+		{
 			readPos = ( readPos + 1 ) % MAX_LOG;
+		}
 
 		// Skip past the '\n'
 		readPos = ( readPos + 1 ) % MAX_LOG;
 	}
 
 	if( CON_LogFree( ) < length )
+	{
 		return 0;
+	}
 
 	if( writePos + length > MAX_LOG )
 	{
@@ -101,13 +109,15 @@ unsigned int CON_LogWrite( const char *in )
 CON_LogRead
 ==================
 */
-unsigned int CON_LogRead( char *out, unsigned int outSize )
+unsigned int CON_LogRead( char* out, unsigned int outSize )
 {
 	unsigned int firstChunk;
 	unsigned int secondChunk;
 
 	if( CON_LogSize( ) < outSize )
+	{
 		outSize = CON_LogSize( );
+	}
 
 	if( readPos + outSize > MAX_LOG )
 	{

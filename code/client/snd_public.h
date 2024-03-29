@@ -28,13 +28,13 @@ void S_Shutdown( void );
 void S_StartSound( vec3_t origin, int entnum, int entchannel, sfxHandle_t sfx );
 void S_StartLocalSound( sfxHandle_t sfx, int channelNum );
 
-void S_StartBackgroundTrack( const char *intro, const char *loop );
+void S_StartBackgroundTrack( const char* intro, const char* loop );
 void S_StopBackgroundTrack( void );
 
 // cinematics and voice-over-network will send raw samples
 // 1.0 volume will be direct output of source samples
-void S_RawSamples(int stream, int samples, int rate, int width, int channels,
-				   const byte *data, float volume, int entityNum);
+void S_RawSamples( int stream, int samples, int rate, int width, int channels,
+				   const byte* data, float volume, int entityNum );
 
 // stop all sounds and the background track
 void S_StopAllSounds( void );
@@ -43,7 +43,7 @@ void S_StopAllSounds( void );
 void S_ClearLoopingSounds( qboolean killall );
 void S_AddLoopingSound( int entityNum, const vec3_t origin, const vec3_t velocity, sfxHandle_t sfx );
 void S_AddRealLoopingSound( int entityNum, const vec3_t origin, const vec3_t velocity, sfxHandle_t sfx );
-void S_StopLoopingSound(int entityNum );
+void S_StopLoopingSound( int entityNum );
 
 // recompute the relative volumes for all running sounds
 // relative to the given entityNum / orientation
@@ -61,9 +61,9 @@ void S_BeginRegistration( void );
 // RegisterSound will allways return a valid sample, even if it
 // has to create a placeholder.  This prevents continuous filesystem
 // checks for missing files
-sfxHandle_t	S_RegisterSound( const char *sample, qboolean compressed );
+sfxHandle_t	S_RegisterSound( const char* sample, qboolean compressed );
 
-void S_DisplayFreeMemory(void);
+void S_DisplayFreeMemory( void );
 
 void S_ClearSoundBuffer( void );
 
@@ -75,7 +75,7 @@ void S_UpdateBackgroundTrack( void );
 #ifdef USE_VOIP
 void S_StartCapture( void );
 int S_AvailableCaptureSamples( void );
-void S_Capture( int samples, byte *data );
+void S_Capture( int samples, byte* data );
 void S_StopCapture( void );
 void S_MasterGain( float gain );
 #endif

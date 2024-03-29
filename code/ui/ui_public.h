@@ -25,7 +25,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #define UI_API_VERSION	6
 
-typedef struct {
+typedef struct
+{
 	connstate_t		connState;
 	int				connectPacketCount;
 	int				clientNum;
@@ -34,7 +35,8 @@ typedef struct {
 	char			messageString[MAX_STRING_CHARS];
 } uiClientState_t;
 
-typedef enum {
+typedef enum
+{
 	UI_ERROR,
 	UI_PRINT,
 	UI_MILLISECONDS,
@@ -136,7 +138,8 @@ typedef enum {
 	UI_CEIL
 } uiImport_t;
 
-typedef enum {
+typedef enum
+{
 	UIMENU_NONE,
 	UIMENU_MAIN,
 	UIMENU_INGAME,
@@ -153,7 +156,8 @@ typedef enum {
 #define SORT_PING			4
 #define SORT_PUNKBUSTER		5
 
-typedef enum {
+typedef enum
+{
 	UI_GETAPIVERSION = 0,	// system reserved
 
 	UI_INIT,

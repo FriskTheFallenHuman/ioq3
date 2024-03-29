@@ -40,10 +40,11 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define	PROGRAM_STACK_SIZE	0x10000
 #define	PROGRAM_STACK_MASK	(PROGRAM_STACK_SIZE-1)
 
-typedef enum {
-	OP_UNDEF, 
+typedef enum
+{
+	OP_UNDEF,
 
-	OP_IGNORE, 
+	OP_IGNORE,
 
 	OP_BREAK,
 
@@ -131,8 +132,9 @@ typedef enum {
 
 typedef int	vmptr_t;
 
-typedef struct vmSymbol_s {
-	struct vmSymbol_s	*next;
+typedef struct vmSymbol_s
+{
+	struct vmSymbol_s*	next;
 	int		symValue;
 	int		profileCount;
 	char	symName[1];		// variable sized
@@ -141,63 +143,64 @@ typedef struct vmSymbol_s {
 #define	VM_OFFSET_PROGRAM_STACK		0
 #define	VM_OFFSET_SYSTEM_CALL		4
 
-struct vm_s {
-    // DO NOT MOVE OR CHANGE THESE WITHOUT CHANGING THE VM_OFFSET_* DEFINES
-    // USED BY THE ASM CODE
-    int			programStack;		// the vm may be recursively entered
-    intptr_t			(*systemCall)( intptr_t *parms );
+struct vm_s
+{
+	// DO NOT MOVE OR CHANGE THESE WITHOUT CHANGING THE VM_OFFSET_* DEFINES
+	// USED BY THE ASM CODE
+	int			programStack;		// the vm may be recursively entered
+	intptr_t	( *systemCall )( intptr_t* parms );
 
 	//------------------------------------
-   
+
 	char		name[MAX_QPATH];
-	void	*searchPath;				// hint for FS_ReadFileDir()
+	void*	searchPath;				// hint for FS_ReadFileDir()
 
 	// for dynamic linked modules
-	void		*dllHandle;
+	void*		dllHandle;
 	vmMainProc	entryPoint;
-	void (*destroy)(vm_t* self);
+	void ( *destroy )( vm_t* self );
 
 	// for interpreted modules
 	qboolean	currentlyInterpreting;
 
 	qboolean	compiled;
-	byte		*codeBase;
+	byte*		codeBase;
 	int			entryOfs;
 	int			codeLength;
 
-	intptr_t	*instructionPointers;
+	intptr_t*	instructionPointers;
 	int			instructionCount;
 
-	byte		*dataBase;
+	byte*		dataBase;
 	int			dataMask;
 	int			dataAlloc;			// actually allocated
 
 	int			stackBottom;		// if programStack < stackBottom, error
 
 	int			numSymbols;
-	struct vmSymbol_s	*symbols;
+	struct vmSymbol_s*	symbols;
 
 	int			callLevel;		// counts recursive VM_Call
 	int			breakFunction;		// increment breakCount on function entry to this
 	int			breakCount;
 
-	byte		*jumpTableTargets;
+	byte*		jumpTableTargets;
 	int			numJumpTableTargets;
 };
 
 
-extern	vm_t	*currentVM;
+extern	vm_t*	currentVM;
 extern	int		vm_debugLevel;
 
-void VM_Compile( vm_t *vm, vmHeader_t *header );
-int	VM_CallCompiled( vm_t *vm, int *args );
+void VM_Compile( vm_t* vm, vmHeader_t* header );
+int	VM_CallCompiled( vm_t* vm, int* args );
 
-void VM_PrepareInterpreter( vm_t *vm, vmHeader_t *header );
-int	VM_CallInterpreted( vm_t *vm, int *args );
+void VM_PrepareInterpreter( vm_t* vm, vmHeader_t* header );
+int	VM_CallInterpreted( vm_t* vm, int* args );
 
-vmSymbol_t *VM_ValueToFunctionSymbol( vm_t *vm, int value );
-int VM_SymbolToValue( vm_t *vm, const char *symbol );
-const char *VM_ValueToSymbol( vm_t *vm, int value );
-void VM_LogSyscalls( int *args );
+vmSymbol_t* VM_ValueToFunctionSymbol( vm_t* vm, int value );
+int VM_SymbolToValue( vm_t* vm, const char* symbol );
+const char* VM_ValueToSymbol( vm_t* vm, int value );
+void VM_LogSyscalls( int* args );
 
-void VM_BlockCopy(unsigned int dest, unsigned int src, size_t n);
+void VM_BlockCopy( unsigned int dest, unsigned int src, size_t n );

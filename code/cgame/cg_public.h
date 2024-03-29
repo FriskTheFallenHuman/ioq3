@@ -22,7 +22,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
 
-#define	CMD_BACKUP			64	
+#define	CMD_BACKUP			64
 #define	CMD_MASK			(CMD_BACKUP - 1)
 // allow a lot of command backups for very fast systems
 // multiple commands may be combined into a single packet, so this
@@ -36,7 +36,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // Snapshots are generated at regular time intervals by the server,
 // but they may not be sent if a client's rate level is exceeded, or
 // they may be dropped by the network.
-typedef struct {
+typedef struct
+{
 	int				snapFlags;			// SNAPFLAG_RATE_DELAYED, etc
 	int				ping;
 
@@ -53,11 +54,12 @@ typedef struct {
 	int				serverCommandSequence;	// snapshot becomes current
 } snapshot_t;
 
-enum {
-  CGAME_EVENT_NONE,
-  CGAME_EVENT_TEAMMENU,
-  CGAME_EVENT_SCOREBOARD,
-  CGAME_EVENT_EDITHUD
+enum
+{
+	CGAME_EVENT_NONE,
+	CGAME_EVENT_TEAMMENU,
+	CGAME_EVENT_SCOREBOARD,
+	CGAME_EVENT_EDITHUD
 };
 
 
@@ -71,7 +73,8 @@ functions imported from the main executable
 
 #define	CGAME_IMPORT_API_VERSION	4
 
-typedef enum {
+typedef enum
+{
 	CG_PRINT,
 	CG_ERROR,
 	CG_MILLISECONDS,
@@ -136,7 +139,7 @@ typedef enum {
 	CG_KEY_GETCATCHER,
 	CG_KEY_SETCATCHER,
 	CG_KEY_GETKEY,
- 	CG_PC_ADD_GLOBAL_DEFINE,
+	CG_PC_ADD_GLOBAL_DEFINE,
 	CG_PC_LOAD_SOURCE,
 	CG_PC_FREE_SOURCE,
 	CG_PC_READ_TOKEN,
@@ -165,11 +168,11 @@ typedef enum {
 	// 1.32
 	CG_FS_SEEK,
 
-/*
-	CG_LOADCAMERA,
-	CG_STARTCAMERA,
-	CG_GETCAMERAINFO,
-*/
+	/*
+		CG_LOADCAMERA,
+		CG_STARTCAMERA,
+		CG_GETCAMERAINFO,
+	*/
 
 	CG_MEMSET = 100,
 	CG_MEMCPY,
@@ -194,7 +197,8 @@ functions exported to the main executable
 ==================================================================
 */
 
-typedef enum {
+typedef enum
+{
 	CG_INIT,
 //	void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum )
 	// called when the level loads or when the renderer is restarted
@@ -226,7 +230,7 @@ typedef enum {
 	CG_LAST_ATTACKER,
 //	int (*CG_LastAttacker)( void );
 
-	CG_KEY_EVENT, 
+	CG_KEY_EVENT,
 //	void	(*CG_KeyEvent)( int key, qboolean down );
 
 	CG_MOUSE_EVENT,

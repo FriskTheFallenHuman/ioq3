@@ -42,7 +42,8 @@ R_InitNextFrame
 
 ====================
 */
-void R_InitNextFrame( void ) {
+void R_InitNextFrame( void )
+{
 	backEndData->commands.used = 0;
 
 	r_firstSceneDrawSurf = 0;
@@ -66,7 +67,8 @@ RE_ClearScene
 
 ====================
 */
-void RE_ClearScene( void ) {
+void RE_ClearScene( void )
+{
 	r_firstSceneDlight = r_numdlights;
 	r_firstSceneEntity = r_numentities;
 	r_firstScenePoly = r_numpolys;
@@ -87,19 +89,21 @@ R_AddPolygonSurfaces
 Adds all the scene's polys into this view's drawsurf list
 =====================
 */
-void R_AddPolygonSurfaces( void ) {
+void R_AddPolygonSurfaces( void )
+{
 	int			i;
-	shader_t	*sh;
-	srfPoly_t	*poly;
+	shader_t*	sh;
+	srfPoly_t*	poly;
 	int		fogMask;
 
 	tr.currentEntityNum = REFENTITYNUM_WORLD;
 	tr.shiftedEntityNum = tr.currentEntityNum << QSORT_REFENTITYNUM_SHIFT;
-	fogMask = -((tr.refdef.rdflags & RDF_NOFOG) == 0);
+	fogMask = -( ( tr.refdef.rdflags & RDF_NOFOG ) == 0 );
 
-	for ( i = 0, poly = tr.refdef.polys; i < tr.refdef.numPolys ; i++, poly++ ) {
+	for( i = 0, poly = tr.refdef.polys; i < tr.refdef.numPolys ; i++, poly++ )
+	{
 		sh = R_GetShaderByHandle( poly->hShader );
-		R_AddDrawSurf( ( void * )poly, sh, poly->fogIndex & fogMask, qfalse, qfalse, 0 /*cubeMap*/  );
+		R_AddDrawSurf( ( void* )poly, sh, poly->fogIndex & fogMask, qfalse, qfalse, 0 /*cubeMap*/ );
 	}
 }
 
@@ -109,33 +113,38 @@ RE_AddPolyToScene
 
 =====================
 */
-void RE_AddPolyToScene( qhandle_t hShader, int numVerts, const polyVert_t *verts, int numPolys ) {
-	srfPoly_t	*poly;
+void RE_AddPolyToScene( qhandle_t hShader, int numVerts, const polyVert_t* verts, int numPolys )
+{
+	srfPoly_t*	poly;
 	int			i, j;
 	int			fogIndex;
-	fog_t		*fog;
+	fog_t*		fog;
 	vec3_t		bounds[2];
 
-	if ( !tr.registered ) {
+	if( !tr.registered )
+	{
 		return;
 	}
 
-	if ( !hShader ) {
+	if( !hShader )
+	{
 		// This isn't a useful warning, and an hShader of zero isn't a null shader, it's
 		// the default shader.
 		//ri.Printf( PRINT_WARNING, "WARNING: RE_AddPolyToScene: NULL poly shader\n");
 		//return;
 	}
 
-	for ( j = 0; j < numPolys; j++ ) {
-		if ( r_numpolyverts + numVerts > max_polyverts || r_numpolys >= max_polys ) {
-      /*
-      NOTE TTimo this was initially a PRINT_WARNING
-      but it happens a lot with high fighting scenes and particles
-      since we don't plan on changing the const and making for room for those effects
-      simply cut this message to developer only
-      */
-			ri.Printf( PRINT_DEVELOPER, "WARNING: RE_AddPolyToScene: r_max_polys or r_max_polyverts reached\n");
+	for( j = 0; j < numPolys; j++ )
+	{
+		if( r_numpolyverts + numVerts > max_polyverts || r_numpolys >= max_polys )
+		{
+			/*
+			NOTE TTimo this was initially a PRINT_WARNING
+			but it happens a lot with high fighting scenes and particles
+			since we don't plan on changing the const and making for room for those effects
+			simply cut this message to developer only
+			*/
+			ri.Printf( PRINT_DEVELOPER, "WARNING: RE_AddPolyToScene: r_max_polys or r_max_polyverts reached\n" );
 			return;
 		}
 
@@ -144,10 +153,11 @@ void RE_AddPolyToScene( qhandle_t hShader, int numVerts, const polyVert_t *verts
 		poly->hShader = hShader;
 		poly->numVerts = numVerts;
 		poly->verts = &backEndData->polyVerts[r_numpolyverts];
-		
-		Com_Memcpy( poly->verts, &verts[numVerts*j], numVerts * sizeof( *verts ) );
 
-		if ( glConfig.hardwareType == GLHW_RAGEPRO ) {
+		Com_Memcpy( poly->verts, &verts[numVerts * j], numVerts * sizeof( *verts ) );
+
+		if( glConfig.hardwareType == GLHW_RAGEPRO )
+		{
 			poly->verts->modulate[0] = 255;
 			poly->verts->modulate[1] = 255;
 			poly->verts->modulate[2] = 255;
@@ -158,31 +168,39 @@ void RE_AddPolyToScene( qhandle_t hShader, int numVerts, const polyVert_t *verts
 		r_numpolyverts += numVerts;
 
 		// if no world is loaded
-		if ( tr.world == NULL ) {
+		if( tr.world == NULL )
+		{
 			fogIndex = 0;
 		}
 		// see if it is in a fog volume
-		else if ( tr.world->numfogs == 1 ) {
+		else if( tr.world->numfogs == 1 )
+		{
 			fogIndex = 0;
-		} else {
+		}
+		else
+		{
 			// find which fog volume the poly is in
 			VectorCopy( poly->verts[0].xyz, bounds[0] );
 			VectorCopy( poly->verts[0].xyz, bounds[1] );
-			for ( i = 1 ; i < poly->numVerts ; i++ ) {
+			for( i = 1 ; i < poly->numVerts ; i++ )
+			{
 				AddPointToBounds( poly->verts[i].xyz, bounds[0], bounds[1] );
 			}
-			for ( fogIndex = 1 ; fogIndex < tr.world->numfogs ; fogIndex++ ) {
-				fog = &tr.world->fogs[fogIndex]; 
-				if ( bounds[1][0] >= fog->bounds[0][0]
-					&& bounds[1][1] >= fog->bounds[0][1]
-					&& bounds[1][2] >= fog->bounds[0][2]
-					&& bounds[0][0] <= fog->bounds[1][0]
-					&& bounds[0][1] <= fog->bounds[1][1]
-					&& bounds[0][2] <= fog->bounds[1][2] ) {
+			for( fogIndex = 1 ; fogIndex < tr.world->numfogs ; fogIndex++ )
+			{
+				fog = &tr.world->fogs[fogIndex];
+				if( bounds[1][0] >= fog->bounds[0][0]
+						&& bounds[1][1] >= fog->bounds[0][1]
+						&& bounds[1][2] >= fog->bounds[0][2]
+						&& bounds[0][0] <= fog->bounds[1][0]
+						&& bounds[0][1] <= fog->bounds[1][1]
+						&& bounds[0][2] <= fog->bounds[1][2] )
+				{
 					break;
 				}
 			}
-			if ( fogIndex == tr.world->numfogs ) {
+			if( fogIndex == tr.world->numfogs )
+			{
 				fogIndex = 0;
 			}
 		}
@@ -200,33 +218,39 @@ RE_AddRefEntityToScene
 
 =====================
 */
-void RE_AddRefEntityToScene( const refEntity_t *ent ) {
+void RE_AddRefEntityToScene( const refEntity_t* ent )
+{
 	vec3_t cross;
 
-	if ( !tr.registered ) {
+	if( !tr.registered )
+	{
 		return;
 	}
-	if ( r_numentities >= MAX_REFENTITIES ) {
-		ri.Printf(PRINT_DEVELOPER, "RE_AddRefEntityToScene: Dropping refEntity, reached MAX_REFENTITIES\n");
+	if( r_numentities >= MAX_REFENTITIES )
+	{
+		ri.Printf( PRINT_DEVELOPER, "RE_AddRefEntityToScene: Dropping refEntity, reached MAX_REFENTITIES\n" );
 		return;
 	}
-	if ( Q_isnan(ent->origin[0]) || Q_isnan(ent->origin[1]) || Q_isnan(ent->origin[2]) ) {
+	if( Q_isnan( ent->origin[0] ) || Q_isnan( ent->origin[1] ) || Q_isnan( ent->origin[2] ) )
+	{
 		static qboolean firstTime = qtrue;
-		if (firstTime) {
+		if( firstTime )
+		{
 			firstTime = qfalse;
-			ri.Printf( PRINT_WARNING, "RE_AddRefEntityToScene passed a refEntity which has an origin with a NaN component\n");
+			ri.Printf( PRINT_WARNING, "RE_AddRefEntityToScene passed a refEntity which has an origin with a NaN component\n" );
 		}
 		return;
 	}
-	if ( (int)ent->reType < 0 || ent->reType >= RT_MAX_REF_ENTITY_TYPE ) {
+	if( ( int )ent->reType < 0 || ent->reType >= RT_MAX_REF_ENTITY_TYPE )
+	{
 		ri.Error( ERR_DROP, "RE_AddRefEntityToScene: bad reType %i", ent->reType );
 	}
 
 	backEndData->entities[r_numentities].e = *ent;
 	backEndData->entities[r_numentities].lightingCalculated = qfalse;
 
-	CrossProduct(ent->axis[0], ent->axis[1], cross);
-	backEndData->entities[r_numentities].mirrored = (DotProduct(ent->axis[2], cross) < 0.f);
+	CrossProduct( ent->axis[0], ent->axis[1], cross );
+	backEndData->entities[r_numentities].mirrored = ( DotProduct( ent->axis[2], cross ) < 0.f );
 
 	r_numentities++;
 }
@@ -238,24 +262,29 @@ RE_AddDynamicLightToScene
 
 =====================
 */
-void RE_AddDynamicLightToScene( const vec3_t org, float intensity, float r, float g, float b, int additive ) {
-	dlight_t	*dl;
+void RE_AddDynamicLightToScene( const vec3_t org, float intensity, float r, float g, float b, int additive )
+{
+	dlight_t*	dl;
 
-	if ( !tr.registered ) {
+	if( !tr.registered )
+	{
 		return;
 	}
-	if ( r_numdlights >= MAX_DLIGHTS ) {
+	if( r_numdlights >= MAX_DLIGHTS )
+	{
 		return;
 	}
-	if ( intensity <= 0 ) {
+	if( intensity <= 0 )
+	{
 		return;
 	}
 	// these cards don't have the correct blend mode
-	if ( glConfig.hardwareType == GLHW_RIVA128 || glConfig.hardwareType == GLHW_PERMEDIA2 ) {
+	if( glConfig.hardwareType == GLHW_RIVA128 || glConfig.hardwareType == GLHW_PERMEDIA2 )
+	{
 		return;
 	}
 	dl = &backEndData->dlights[r_numdlights++];
-	VectorCopy (org, dl->origin);
+	VectorCopy( org, dl->origin );
 	dl->radius = intensity;
 	dl->color[0] = r;
 	dl->color[1] = g;
@@ -269,7 +298,8 @@ RE_AddLightToScene
 
 =====================
 */
-void RE_AddLightToScene( const vec3_t org, float intensity, float r, float g, float b ) {
+void RE_AddLightToScene( const vec3_t org, float intensity, float r, float g, float b )
+{
 	RE_AddDynamicLightToScene( org, intensity, r, g, b, qfalse );
 }
 
@@ -279,12 +309,13 @@ RE_AddAdditiveLightToScene
 
 =====================
 */
-void RE_AddAdditiveLightToScene( const vec3_t org, float intensity, float r, float g, float b ) {
+void RE_AddAdditiveLightToScene( const vec3_t org, float intensity, float r, float g, float b )
+{
 	RE_AddDynamicLightToScene( org, intensity, r, g, b, qtrue );
 }
 
 
-void RE_BeginScene(const refdef_t *fd)
+void RE_BeginScene( const refdef_t* fd )
 {
 	Com_Memcpy( tr.refdef.text, fd->text, sizeof( tr.refdef.text ) );
 
@@ -306,18 +337,21 @@ void RE_BeginScene(const refdef_t *fd)
 	// copy the areamask data over and note if it has changed, which
 	// will force a reset of the visible leafs even if the view hasn't moved
 	tr.refdef.areamaskModified = qfalse;
-	if ( ! (tr.refdef.rdflags & RDF_NOWORLDMODEL) ) {
+	if( !( tr.refdef.rdflags & RDF_NOWORLDMODEL ) )
+	{
 		int		areaDiff;
 		int		i;
 
 		// compare the area bits
 		areaDiff = 0;
-		for (i = 0 ; i < MAX_MAP_AREA_BYTES/4 ; i++) {
-			areaDiff |= ((int *)tr.refdef.areamask)[i] ^ ((int *)fd->areamask)[i];
-			((int *)tr.refdef.areamask)[i] = ((int *)fd->areamask)[i];
+		for( i = 0 ; i < MAX_MAP_AREA_BYTES / 4 ; i++ )
+		{
+			areaDiff |= ( ( int* )tr.refdef.areamask )[i] ^ ( ( int* )fd->areamask )[i];
+			( ( int* )tr.refdef.areamask )[i] = ( ( int* )fd->areamask )[i];
 		}
 
-		if ( areaDiff ) {
+		if( areaDiff )
+		{
 			// a door just opened or something
 			tr.refdef.areamaskModified = qtrue;
 		}
@@ -327,36 +361,45 @@ void RE_BeginScene(const refdef_t *fd)
 	tr.refdef.sunCol[3] = 1.0f;
 	tr.refdef.sunAmbCol[3] = 1.0f;
 
-	VectorCopy(tr.sunDirection, tr.refdef.sunDir);
-	if ( (tr.refdef.rdflags & RDF_NOWORLDMODEL) || !(r_depthPrepass->value) ){
-		VectorSet(tr.refdef.sunCol, 0, 0, 0);
-		VectorSet(tr.refdef.sunAmbCol, 0, 0, 0);
+	VectorCopy( tr.sunDirection, tr.refdef.sunDir );
+	if( ( tr.refdef.rdflags & RDF_NOWORLDMODEL ) || !( r_depthPrepass->value ) )
+	{
+		VectorSet( tr.refdef.sunCol, 0, 0, 0 );
+		VectorSet( tr.refdef.sunAmbCol, 0, 0, 0 );
 	}
 	else
 	{
-		float scale = (1 << r_mapOverBrightBits->integer) / 255.0f;
+		float scale = ( 1 << r_mapOverBrightBits->integer ) / 255.0f;
 
-		if (r_forceSun->integer)
-			VectorScale(tr.sunLight, scale * r_forceSunLightScale->value, tr.refdef.sunCol);
-		else
-			VectorScale(tr.sunLight, scale, tr.refdef.sunCol);
-
-		if (r_sunlightMode->integer == 1)
+		if( r_forceSun->integer )
 		{
-			tr.refdef.sunAmbCol[0] =
-			tr.refdef.sunAmbCol[1] =
-			tr.refdef.sunAmbCol[2] = r_forceSun->integer ? r_forceSunAmbientScale->value : tr.sunShadowScale;
+			VectorScale( tr.sunLight, scale * r_forceSunLightScale->value, tr.refdef.sunCol );
 		}
 		else
 		{
-			if (r_forceSun->integer)
-				VectorScale(tr.sunLight, scale * r_forceSunAmbientScale->value, tr.refdef.sunAmbCol);
+			VectorScale( tr.sunLight, scale, tr.refdef.sunCol );
+		}
+
+		if( r_sunlightMode->integer == 1 )
+		{
+			tr.refdef.sunAmbCol[0] =
+				tr.refdef.sunAmbCol[1] =
+					tr.refdef.sunAmbCol[2] = r_forceSun->integer ? r_forceSunAmbientScale->value : tr.sunShadowScale;
+		}
+		else
+		{
+			if( r_forceSun->integer )
+			{
+				VectorScale( tr.sunLight, scale * r_forceSunAmbientScale->value, tr.refdef.sunAmbCol );
+			}
 			else
-				VectorScale(tr.sunLight, scale * tr.sunShadowScale, tr.refdef.sunAmbCol);
+			{
+				VectorScale( tr.sunLight, scale * tr.sunShadowScale, tr.refdef.sunAmbCol );
+			}
 		}
 	}
 
-	if (r_forceAutoExposure->integer)
+	if( r_forceAutoExposure->integer )
 	{
 		tr.refdef.autoExposureMinMax[0] = r_forceAutoExposureMin->value;
 		tr.refdef.autoExposureMinMax[1] = r_forceAutoExposureMax->value;
@@ -367,32 +410,33 @@ void RE_BeginScene(const refdef_t *fd)
 		tr.refdef.autoExposureMinMax[1] = tr.autoExposureMinMax[1];
 	}
 
-	if (r_forceToneMap->integer)
+	if( r_forceToneMap->integer )
 	{
-		tr.refdef.toneMinAvgMaxLinear[0] = pow(2, r_forceToneMapMin->value);
-		tr.refdef.toneMinAvgMaxLinear[1] = pow(2, r_forceToneMapAvg->value);
-		tr.refdef.toneMinAvgMaxLinear[2] = pow(2, r_forceToneMapMax->value);
+		tr.refdef.toneMinAvgMaxLinear[0] = pow( 2, r_forceToneMapMin->value );
+		tr.refdef.toneMinAvgMaxLinear[1] = pow( 2, r_forceToneMapAvg->value );
+		tr.refdef.toneMinAvgMaxLinear[2] = pow( 2, r_forceToneMapMax->value );
 	}
 	else
 	{
-		tr.refdef.toneMinAvgMaxLinear[0] = pow(2, tr.toneMinAvgMaxLevel[0]);
-		tr.refdef.toneMinAvgMaxLinear[1] = pow(2, tr.toneMinAvgMaxLevel[1]);
-		tr.refdef.toneMinAvgMaxLinear[2] = pow(2, tr.toneMinAvgMaxLevel[2]);
+		tr.refdef.toneMinAvgMaxLinear[0] = pow( 2, tr.toneMinAvgMaxLevel[0] );
+		tr.refdef.toneMinAvgMaxLinear[1] = pow( 2, tr.toneMinAvgMaxLevel[1] );
+		tr.refdef.toneMinAvgMaxLinear[2] = pow( 2, tr.toneMinAvgMaxLevel[2] );
 	}
 
 	// Makro - copy exta info if present
-	if (fd->rdflags & RDF_EXTRA) {
-		const refdefex_t* extra = (const refdefex_t*) (fd+1);
+	if( fd->rdflags & RDF_EXTRA )
+	{
+		const refdefex_t* extra = ( const refdefex_t* )( fd + 1 );
 
 		tr.refdef.blurFactor = extra->blurFactor;
 
-		if (fd->rdflags & RDF_SUNLIGHT)
+		if( fd->rdflags & RDF_SUNLIGHT )
 		{
-			VectorCopy(extra->sunDir,    tr.refdef.sunDir);
-			VectorCopy(extra->sunCol,    tr.refdef.sunCol);
-			VectorCopy(extra->sunAmbCol, tr.refdef.sunAmbCol);
+			VectorCopy( extra->sunDir,    tr.refdef.sunDir );
+			VectorCopy( extra->sunCol,    tr.refdef.sunCol );
+			VectorCopy( extra->sunAmbCol, tr.refdef.sunAmbCol );
 		}
-	} 
+	}
 	else
 	{
 		tr.refdef.blurFactor = 0.0f;
@@ -419,9 +463,10 @@ void RE_BeginScene(const refdef_t *fd)
 
 	// turn off dynamic lighting globally by clearing all the
 	// dlights if it needs to be disabled or if vertex lighting is enabled
-	if ( r_dynamiclight->integer == 0 ||
-		 r_vertexLight->integer == 1 ||
-		 glConfig.hardwareType == GLHW_PERMEDIA2 ) {
+	if( r_dynamiclight->integer == 0 ||
+			r_vertexLight->integer == 1 ||
+			glConfig.hardwareType == GLHW_PERMEDIA2 )
+	{
 		tr.refdef.num_dlights = 0;
 	}
 
@@ -435,7 +480,7 @@ void RE_BeginScene(const refdef_t *fd)
 }
 
 
-void RE_EndScene(void)
+void RE_EndScene( void )
 {
 	// the next scene rendered in this frame will tack on after this one
 	r_firstSceneDrawSurf = tr.refdef.numDrawSurfs;
@@ -455,79 +500,83 @@ Rendering a scene may require multiple views to be rendered
 to handle mirrors,
 @@@@@@@@@@@@@@@@@@@@@
 */
-void RE_RenderScene( const refdef_t *fd ) {
+void RE_RenderScene( const refdef_t* fd )
+{
 	viewParms_t		parms;
 	int				startTime;
 
-	if ( !tr.registered ) {
+	if( !tr.registered )
+	{
 		return;
 	}
 	GLimp_LogComment( "====== RE_RenderScene =====\n" );
 
-	if ( r_norefresh->integer ) {
+	if( r_norefresh->integer )
+	{
 		return;
 	}
 
 	startTime = ri.Milliseconds();
 
-	if (!tr.world && !( fd->rdflags & RDF_NOWORLDMODEL ) ) {
-		ri.Error (ERR_DROP, "R_RenderScene: NULL worldmodel");
+	if( !tr.world && !( fd->rdflags & RDF_NOWORLDMODEL ) )
+	{
+		ri.Error( ERR_DROP, "R_RenderScene: NULL worldmodel" );
 	}
 
-	RE_BeginScene(fd);
+	RE_BeginScene( fd );
 
 	// SmileTheory: playing with shadow mapping
-	if (!( fd->rdflags & RDF_NOWORLDMODEL ) && tr.refdef.num_dlights && r_dlightMode->integer >= 2)
+	if( !( fd->rdflags & RDF_NOWORLDMODEL ) && tr.refdef.num_dlights && r_dlightMode->integer >= 2 )
 	{
-		R_RenderDlightCubemaps(fd);
+		R_RenderDlightCubemaps( fd );
 	}
 
 	/* playing with more shadows */
-	if(glRefConfig.framebufferObject && !( fd->rdflags & RDF_NOWORLDMODEL ) && r_shadows->integer == 4)
+	if( glRefConfig.framebufferObject && !( fd->rdflags & RDF_NOWORLDMODEL ) && r_shadows->integer == 4 )
 	{
-		R_RenderPshadowMaps(fd);
+		R_RenderPshadowMaps( fd );
 	}
 
 	// playing with even more shadows
-	if(glRefConfig.framebufferObject && r_sunlightMode->integer && !( fd->rdflags & RDF_NOWORLDMODEL ) && (r_forceSun->integer || tr.sunShadows))
+	if( glRefConfig.framebufferObject && r_sunlightMode->integer && !( fd->rdflags & RDF_NOWORLDMODEL ) && ( r_forceSun->integer || tr.sunShadows ) )
 	{
-		if (r_shadowCascadeZFar->integer != 0)
+		if( r_shadowCascadeZFar->integer != 0 )
 		{
-			R_RenderSunShadowMaps(fd, 0);
-			R_RenderSunShadowMaps(fd, 1);
-			R_RenderSunShadowMaps(fd, 2);
+			R_RenderSunShadowMaps( fd, 0 );
+			R_RenderSunShadowMaps( fd, 1 );
+			R_RenderSunShadowMaps( fd, 2 );
 		}
 		else
 		{
-			Mat4Zero(tr.refdef.sunShadowMvp[0]);
-			Mat4Zero(tr.refdef.sunShadowMvp[1]);
-			Mat4Zero(tr.refdef.sunShadowMvp[2]);
+			Mat4Zero( tr.refdef.sunShadowMvp[0] );
+			Mat4Zero( tr.refdef.sunShadowMvp[1] );
+			Mat4Zero( tr.refdef.sunShadowMvp[2] );
 		}
 
 		// only rerender last cascade if sun has changed position
-		if (r_forceSun->integer == 2 || !VectorCompare(tr.refdef.sunDir, tr.lastCascadeSunDirection))
+		if( r_forceSun->integer == 2 || !VectorCompare( tr.refdef.sunDir, tr.lastCascadeSunDirection ) )
 		{
-			VectorCopy(tr.refdef.sunDir, tr.lastCascadeSunDirection);
-			R_RenderSunShadowMaps(fd, 3);
-			Mat4Copy(tr.refdef.sunShadowMvp[3], tr.lastCascadeSunMvp);
+			VectorCopy( tr.refdef.sunDir, tr.lastCascadeSunDirection );
+			R_RenderSunShadowMaps( fd, 3 );
+			Mat4Copy( tr.refdef.sunShadowMvp[3], tr.lastCascadeSunMvp );
 		}
 		else
 		{
-			Mat4Copy(tr.lastCascadeSunMvp, tr.refdef.sunShadowMvp[3]);
+			Mat4Copy( tr.lastCascadeSunMvp, tr.refdef.sunShadowMvp[3] );
 		}
 	}
 
 	// playing with cube maps
 	// this is where dynamic cubemaps would be rendered
-	if (0) //(glRefConfig.framebufferObject && !( fd->rdflags & RDF_NOWORLDMODEL ))
+	if( 0 ) //(glRefConfig.framebufferObject && !( fd->rdflags & RDF_NOWORLDMODEL ))
 	{
 		int i, j;
 
-		for (i = 0; i < tr.numCubemaps; i++)
+		for( i = 0; i < tr.numCubemaps; i++ )
 		{
-			for (j = 0; j < 6; j++)
+			for( j = 0; j < 6; j++ )
 			{
-				R_RenderCubemapSide(i, j, qtrue);
+				R_RenderCubemapSide( i, j, qtrue );
 			}
 		}
 	}
@@ -547,7 +596,7 @@ void RE_RenderScene( const refdef_t *fd ) {
 
 	parms.fovX = tr.refdef.fov_x;
 	parms.fovY = tr.refdef.fov_y;
-	
+
 	parms.stereoFrame = tr.refdef.stereoFrame;
 
 	VectorCopy( fd->vieworg, parms.or.origin );
@@ -557,15 +606,17 @@ void RE_RenderScene( const refdef_t *fd ) {
 
 	VectorCopy( fd->vieworg, parms.pvsOrigin );
 
-	if(!( fd->rdflags & RDF_NOWORLDMODEL ) && r_depthPrepass->value && ((r_forceSun->integer) || tr.sunShadows))
+	if( !( fd->rdflags & RDF_NOWORLDMODEL ) && r_depthPrepass->value && ( ( r_forceSun->integer ) || tr.sunShadows ) )
 	{
 		parms.flags = VPF_USESUNLIGHT;
 	}
 
 	R_RenderView( &parms );
 
-	if(!( fd->rdflags & RDF_NOWORLDMODEL ))
+	if( !( fd->rdflags & RDF_NOWORLDMODEL ) )
+	{
 		R_AddPostProcessCmd();
+	}
 
 	RE_EndScene();
 

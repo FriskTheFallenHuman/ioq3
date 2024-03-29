@@ -1,10 +1,11 @@
 #import <Cocoa/Cocoa.h>
 
-@interface ErrorWindow : NSObject {
+@interface ErrorWindow : NSObject
+{
 	IBOutlet id		errorWindow;
-    IBOutlet id		errorTextField;
+	IBOutlet id		errorTextField;
 }
 
-- (void)bitch:(NSString *)errorlog;
+- ( void )bitch:( NSString* )errorlog;
 
 @end

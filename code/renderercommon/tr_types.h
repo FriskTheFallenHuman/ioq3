@@ -40,38 +40,41 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define	RF_DEPTHHACK		0x0008		// for view weapon Z crunching
 
 #define RF_CROSSHAIR		0x0010		// This item is a cross hair and will draw over everything similar to
-						// DEPTHHACK in stereo rendering mode, with the difference that the
-						// projection matrix won't be hacked to reduce the stereo separation as
-						// is done for the gun.
+// DEPTHHACK in stereo rendering mode, with the difference that the
+// projection matrix won't be hacked to reduce the stereo separation as
+// is done for the gun.
 
 #define	RF_NOSHADOW		0x0040		// don't add stencil shadows
 
 #define RF_LIGHTING_ORIGIN	0x0080		// use refEntity->lightingOrigin instead of refEntity->origin
-						// for lighting.  This allows entities to sink into the floor
-						// with their origin going solid, and allows all parts of a
-						// player to get the same lighting
+// for lighting.  This allows entities to sink into the floor
+// with their origin going solid, and allows all parts of a
+// player to get the same lighting
 
 #define	RF_SHADOW_PLANE		0x0100		// use refEntity->shadowPlane
 #define	RF_WRAP_FRAMES		0x0200		// mod the model frames by the maxframes to allow continuous
-										// animation without needing to know the frame count
+// animation without needing to know the frame count
 
 // refdef flags
 #define RDF_NOWORLDMODEL	0x0001		// used for player configuration screen
 #define RDF_HYPERSPACE		0x0004		// teleportation effect
 
-typedef struct {
+typedef struct
+{
 	vec3_t		xyz;
 	float		st[2];
 	byte		modulate[4];
 } polyVert_t;
 
-typedef struct poly_s {
+typedef struct poly_s
+{
 	qhandle_t			hShader;
 	int					numVerts;
-	polyVert_t			*verts;
+	polyVert_t*			verts;
 } poly_t;
 
-typedef enum {
+typedef enum
+{
 	RT_MODEL,
 	RT_POLY,
 	RT_SPRITE,
@@ -84,7 +87,8 @@ typedef enum {
 	RT_MAX_REF_ENTITY_TYPE
 } refEntityType_t;
 
-typedef struct {
+typedef struct
+{
 	refEntityType_t	reType;
 	int			renderfx;
 
@@ -123,7 +127,8 @@ typedef struct {
 #define	MAX_RENDER_STRINGS			8
 #define	MAX_RENDER_STRING_LENGTH	32
 
-typedef struct {
+typedef struct
+{
 	int			x, y, width, height;
 	float		fov_x, fov_y;
 	vec3_t		vieworg;
@@ -142,7 +147,8 @@ typedef struct {
 } refdef_t;
 
 
-typedef enum {
+typedef enum
+{
 	STEREO_CENTER,
 	STEREO_LEFT,
 	STEREO_RIGHT
@@ -156,33 +162,37 @@ typedef enum {
 ** being run right now.  These are constant once the OpenGL
 ** subsystem is initialized.
 */
-typedef enum {
+typedef enum
+{
 	TC_NONE,
 	TC_S3TC,  // this is for the GL_S3_s3tc extension.
 	TC_S3TC_ARB  // this is for the GL_EXT_texture_compression_s3tc extension.
 } textureCompression_t;
 
-typedef enum {
+typedef enum
+{
 	GLDRV_ICD,					// driver is integrated with window system
-								// WARNING: there are tests that check for
-								// > GLDRV_ICD for minidriverness, so this
-								// should always be the lowest value in this
-								// enum set
+	// WARNING: there are tests that check for
+	// > GLDRV_ICD for minidriverness, so this
+	// should always be the lowest value in this
+	// enum set
 	GLDRV_STANDALONE,			// driver is a non-3Dfx standalone driver
 	GLDRV_VOODOO				// driver is a 3Dfx standalone driver
 } glDriverType_t;
 
-typedef enum {
+typedef enum
+{
 	GLHW_GENERIC,			// where everything works the way it should
 	GLHW_3DFX_2D3D,			// Voodoo Banshee or Voodoo3, relevant since if this is
-							// the hardware type then there can NOT exist a secondary
-							// display adapter
+	// the hardware type then there can NOT exist a secondary
+	// display adapter
 	GLHW_RIVA128,			// where you can't interpolate alpha
 	GLHW_RAGEPRO,			// where you can't modulate alpha on alpha textures
 	GLHW_PERMEDIA2			// where you don't have src*dst
 } glHardwareType_t;
 
-typedef struct {
+typedef struct
+{
 	char					renderer_string[MAX_STRING_CHARS];
 	char					vendor_string[MAX_STRING_CHARS];
 	char					version_string[MAX_STRING_CHARS];

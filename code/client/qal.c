@@ -107,7 +107,7 @@ LPALCCAPTURESTART qalcCaptureStart;
 LPALCCAPTURESTOP qalcCaptureStop;
 LPALCCAPTURESAMPLES qalcCaptureSamples;
 
-static void *OpenALLib = NULL;
+static void* OpenALLib = NULL;
 
 static qboolean alinit_fail = qfalse;
 
@@ -116,21 +116,21 @@ static qboolean alinit_fail = qfalse;
 GPA
 =================
 */
-static void *GPA(char *str)
+static void* GPA( char* str )
 {
-	void *rv;
+	void* rv;
 
-	rv = Sys_LoadFunction(OpenALLib, str);
-	if(!rv)
+	rv = Sys_LoadFunction( OpenALLib, str );
+	if( !rv )
 	{
-		Com_Printf( " Can't load symbol %s\n", str);
+		Com_Printf( " Can't load symbol %s\n", str );
 		alinit_fail = qtrue;
 		return NULL;
 	}
 	else
 	{
-		Com_DPrintf( " Loaded symbol %s (%p)\n", str, rv);
-        return rv;
+		Com_DPrintf( " Loaded symbol %s (%p)\n", str, rv );
+		return rv;
 	}
 }
 
@@ -139,96 +139,100 @@ static void *GPA(char *str)
 QAL_Init
 =================
 */
-qboolean QAL_Init(const char *libname)
+qboolean QAL_Init( const char* libname )
 {
-	if(OpenALLib)
+	if( OpenALLib )
+	{
 		return qtrue;
+	}
 
-	if(!(OpenALLib = Sys_LoadDll(libname, qtrue)))
+	if( !( OpenALLib = Sys_LoadDll( libname, qtrue ) ) )
+	{
 		return qfalse;
+	}
 
 	alinit_fail = qfalse;
 
-	qalEnable = GPA("alEnable");
-	qalDisable = GPA("alDisable");
-	qalIsEnabled = GPA("alIsEnabled");
-	qalGetString = GPA("alGetString");
-	qalGetBooleanv = GPA("alGetBooleanv");
-	qalGetIntegerv = GPA("alGetIntegerv");
-	qalGetFloatv = GPA("alGetFloatv");
-	qalGetDoublev = GPA("alGetDoublev");
-	qalGetBoolean = GPA("alGetBoolean");
-	qalGetInteger = GPA("alGetInteger");
-	qalGetFloat = GPA("alGetFloat");
-	qalGetDouble = GPA("alGetDouble");
-	qalGetError = GPA("alGetError");
-	qalIsExtensionPresent = GPA("alIsExtensionPresent");
-	qalGetProcAddress = GPA("alGetProcAddress");
-	qalGetEnumValue = GPA("alGetEnumValue");
-	qalListenerf = GPA("alListenerf");
-	qalListener3f = GPA("alListener3f");
-	qalListenerfv = GPA("alListenerfv");
-	qalListeneri = GPA("alListeneri");
-	qalGetListenerf = GPA("alGetListenerf");
-	qalGetListener3f = GPA("alGetListener3f");
-	qalGetListenerfv = GPA("alGetListenerfv");
-	qalGetListeneri = GPA("alGetListeneri");
-	qalGenSources = GPA("alGenSources");
-	qalDeleteSources = GPA("alDeleteSources");
-	qalIsSource = GPA("alIsSource");
-	qalSourcef = GPA("alSourcef");
-	qalSource3f = GPA("alSource3f");
-	qalSourcefv = GPA("alSourcefv");
-	qalSourcei = GPA("alSourcei");
-	qalGetSourcef = GPA("alGetSourcef");
-	qalGetSource3f = GPA("alGetSource3f");
-	qalGetSourcefv = GPA("alGetSourcefv");
-	qalGetSourcei = GPA("alGetSourcei");
-	qalSourcePlayv = GPA("alSourcePlayv");
-	qalSourceStopv = GPA("alSourceStopv");
-	qalSourceRewindv = GPA("alSourceRewindv");
-	qalSourcePausev = GPA("alSourcePausev");
-	qalSourcePlay = GPA("alSourcePlay");
-	qalSourceStop = GPA("alSourceStop");
-	qalSourceRewind = GPA("alSourceRewind");
-	qalSourcePause = GPA("alSourcePause");
-	qalSourceQueueBuffers = GPA("alSourceQueueBuffers");
-	qalSourceUnqueueBuffers = GPA("alSourceUnqueueBuffers");
-	qalGenBuffers = GPA("alGenBuffers");
-	qalDeleteBuffers = GPA("alDeleteBuffers");
-	qalIsBuffer = GPA("alIsBuffer");
-	qalBufferData = GPA("alBufferData");
-	qalGetBufferf = GPA("alGetBufferf");
-	qalGetBufferi = GPA("alGetBufferi");
-	qalDopplerFactor = GPA("alDopplerFactor");
-	qalSpeedOfSound = GPA("alSpeedOfSound");
-	qalDistanceModel = GPA("alDistanceModel");
+	qalEnable = GPA( "alEnable" );
+	qalDisable = GPA( "alDisable" );
+	qalIsEnabled = GPA( "alIsEnabled" );
+	qalGetString = GPA( "alGetString" );
+	qalGetBooleanv = GPA( "alGetBooleanv" );
+	qalGetIntegerv = GPA( "alGetIntegerv" );
+	qalGetFloatv = GPA( "alGetFloatv" );
+	qalGetDoublev = GPA( "alGetDoublev" );
+	qalGetBoolean = GPA( "alGetBoolean" );
+	qalGetInteger = GPA( "alGetInteger" );
+	qalGetFloat = GPA( "alGetFloat" );
+	qalGetDouble = GPA( "alGetDouble" );
+	qalGetError = GPA( "alGetError" );
+	qalIsExtensionPresent = GPA( "alIsExtensionPresent" );
+	qalGetProcAddress = GPA( "alGetProcAddress" );
+	qalGetEnumValue = GPA( "alGetEnumValue" );
+	qalListenerf = GPA( "alListenerf" );
+	qalListener3f = GPA( "alListener3f" );
+	qalListenerfv = GPA( "alListenerfv" );
+	qalListeneri = GPA( "alListeneri" );
+	qalGetListenerf = GPA( "alGetListenerf" );
+	qalGetListener3f = GPA( "alGetListener3f" );
+	qalGetListenerfv = GPA( "alGetListenerfv" );
+	qalGetListeneri = GPA( "alGetListeneri" );
+	qalGenSources = GPA( "alGenSources" );
+	qalDeleteSources = GPA( "alDeleteSources" );
+	qalIsSource = GPA( "alIsSource" );
+	qalSourcef = GPA( "alSourcef" );
+	qalSource3f = GPA( "alSource3f" );
+	qalSourcefv = GPA( "alSourcefv" );
+	qalSourcei = GPA( "alSourcei" );
+	qalGetSourcef = GPA( "alGetSourcef" );
+	qalGetSource3f = GPA( "alGetSource3f" );
+	qalGetSourcefv = GPA( "alGetSourcefv" );
+	qalGetSourcei = GPA( "alGetSourcei" );
+	qalSourcePlayv = GPA( "alSourcePlayv" );
+	qalSourceStopv = GPA( "alSourceStopv" );
+	qalSourceRewindv = GPA( "alSourceRewindv" );
+	qalSourcePausev = GPA( "alSourcePausev" );
+	qalSourcePlay = GPA( "alSourcePlay" );
+	qalSourceStop = GPA( "alSourceStop" );
+	qalSourceRewind = GPA( "alSourceRewind" );
+	qalSourcePause = GPA( "alSourcePause" );
+	qalSourceQueueBuffers = GPA( "alSourceQueueBuffers" );
+	qalSourceUnqueueBuffers = GPA( "alSourceUnqueueBuffers" );
+	qalGenBuffers = GPA( "alGenBuffers" );
+	qalDeleteBuffers = GPA( "alDeleteBuffers" );
+	qalIsBuffer = GPA( "alIsBuffer" );
+	qalBufferData = GPA( "alBufferData" );
+	qalGetBufferf = GPA( "alGetBufferf" );
+	qalGetBufferi = GPA( "alGetBufferi" );
+	qalDopplerFactor = GPA( "alDopplerFactor" );
+	qalSpeedOfSound = GPA( "alSpeedOfSound" );
+	qalDistanceModel = GPA( "alDistanceModel" );
 
-	qalcCreateContext = GPA("alcCreateContext");
-	qalcMakeContextCurrent = GPA("alcMakeContextCurrent");
-	qalcProcessContext = GPA("alcProcessContext");
-	qalcSuspendContext = GPA("alcSuspendContext");
-	qalcDestroyContext = GPA("alcDestroyContext");
-	qalcGetCurrentContext = GPA("alcGetCurrentContext");
-	qalcGetContextsDevice = GPA("alcGetContextsDevice");
-	qalcOpenDevice = GPA("alcOpenDevice");
-	qalcCloseDevice = GPA("alcCloseDevice");
-	qalcGetError = GPA("alcGetError");
-	qalcIsExtensionPresent = GPA("alcIsExtensionPresent");
-	qalcGetProcAddress = GPA("alcGetProcAddress");
-	qalcGetEnumValue = GPA("alcGetEnumValue");
-	qalcGetString = GPA("alcGetString");
-	qalcGetIntegerv = GPA("alcGetIntegerv");
-	qalcCaptureOpenDevice = GPA("alcCaptureOpenDevice");
-	qalcCaptureCloseDevice = GPA("alcCaptureCloseDevice");
-	qalcCaptureStart = GPA("alcCaptureStart");
-	qalcCaptureStop = GPA("alcCaptureStop");
-	qalcCaptureSamples = GPA("alcCaptureSamples");
+	qalcCreateContext = GPA( "alcCreateContext" );
+	qalcMakeContextCurrent = GPA( "alcMakeContextCurrent" );
+	qalcProcessContext = GPA( "alcProcessContext" );
+	qalcSuspendContext = GPA( "alcSuspendContext" );
+	qalcDestroyContext = GPA( "alcDestroyContext" );
+	qalcGetCurrentContext = GPA( "alcGetCurrentContext" );
+	qalcGetContextsDevice = GPA( "alcGetContextsDevice" );
+	qalcOpenDevice = GPA( "alcOpenDevice" );
+	qalcCloseDevice = GPA( "alcCloseDevice" );
+	qalcGetError = GPA( "alcGetError" );
+	qalcIsExtensionPresent = GPA( "alcIsExtensionPresent" );
+	qalcGetProcAddress = GPA( "alcGetProcAddress" );
+	qalcGetEnumValue = GPA( "alcGetEnumValue" );
+	qalcGetString = GPA( "alcGetString" );
+	qalcGetIntegerv = GPA( "alcGetIntegerv" );
+	qalcCaptureOpenDevice = GPA( "alcCaptureOpenDevice" );
+	qalcCaptureCloseDevice = GPA( "alcCaptureCloseDevice" );
+	qalcCaptureStart = GPA( "alcCaptureStart" );
+	qalcCaptureStop = GPA( "alcCaptureStop" );
+	qalcCaptureSamples = GPA( "alcCaptureSamples" );
 
-	if(alinit_fail)
+	if( alinit_fail )
 	{
 		QAL_Shutdown();
-		Com_Printf( " One or more symbols not found\n");
+		Com_Printf( " One or more symbols not found\n" );
 		return qfalse;
 	}
 
@@ -242,9 +246,9 @@ QAL_Shutdown
 */
 void QAL_Shutdown( void )
 {
-	if(OpenALLib)
+	if( OpenALLib )
 	{
-		Sys_UnloadLibrary(OpenALLib);
+		Sys_UnloadLibrary( OpenALLib );
 		OpenALLib = NULL;
 	}
 
@@ -325,7 +329,7 @@ void QAL_Shutdown( void )
 	qalcCaptureSamples = NULL;
 }
 #else
-qboolean QAL_Init(const char *libname)
+qboolean QAL_Init( const char* libname )
 {
 	return qtrue;
 }

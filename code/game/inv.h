@@ -81,7 +81,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // if running the mission pack
 #ifdef MISSIONPACK
 
-//#error "running mission pack"
+	//#error "running mission pack"
 
 #endif
 

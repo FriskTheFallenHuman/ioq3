@@ -51,14 +51,17 @@ static resetMenu_t	s_reset;
 Reset_MenuEvent
 =================
 */
-void Reset_MenuEvent(void* ptr, int event) {
-	if( event != QM_ACTIVATED ) {
+void Reset_MenuEvent( void* ptr, int event )
+{
+	if( event != QM_ACTIVATED )
+	{
 		return;
 	}
 
 	UI_PopMenu();
 
-	if( ((menucommon_s*)ptr)->id == ID_NO ) {
+	if( ( ( menucommon_s* )ptr )->id == ID_NO )
+	{
 		return;
 	}
 
@@ -75,24 +78,26 @@ void Reset_MenuEvent(void* ptr, int event) {
 Reset_MenuKey
 =================
 */
-static sfxHandle_t Reset_MenuKey( int key ) {
-	switch ( key ) {
-	case K_KP_LEFTARROW:
-	case K_LEFTARROW:
-	case K_KP_RIGHTARROW:
-	case K_RIGHTARROW:
-		key = K_TAB;
-		break;
+static sfxHandle_t Reset_MenuKey( int key )
+{
+	switch( key )
+	{
+		case K_KP_LEFTARROW:
+		case K_LEFTARROW:
+		case K_KP_RIGHTARROW:
+		case K_RIGHTARROW:
+			key = K_TAB;
+			break;
 
-	case 'n':
-	case 'N':
-		Reset_MenuEvent( &s_reset.no, QM_ACTIVATED );
-		break;
+		case 'n':
+		case 'N':
+			Reset_MenuEvent( &s_reset.no, QM_ACTIVATED );
+			break;
 
-	case 'y':
-	case 'Y':
-		Reset_MenuEvent( &s_reset.yes, QM_ACTIVATED );
-		break;
+		case 'y':
+		case 'Y':
+			Reset_MenuEvent( &s_reset.yes, QM_ACTIVATED );
+			break;
 	}
 
 	return Menu_DefaultKey( &s_reset.menu, key );
@@ -104,16 +109,17 @@ static sfxHandle_t Reset_MenuKey( int key ) {
 Reset_MenuDraw
 =================
 */
-static void Reset_MenuDraw( void ) {
+static void Reset_MenuDraw( void )
+{
 	UI_DrawNamedPic( 142, 118, 359, 256, ART_FRAME );
-	UI_DrawProportionalString( 320, 194 + 10, "RESET GAME?", UI_CENTER|UI_INVERSE, color_red );
-	UI_DrawProportionalString( s_reset.slashX, 265, "/", UI_LEFT|UI_INVERSE, color_red );
+	UI_DrawProportionalString( 320, 194 + 10, "RESET GAME?", UI_CENTER | UI_INVERSE, color_red );
+	UI_DrawProportionalString( s_reset.slashX, 265, "/", UI_LEFT | UI_INVERSE, color_red );
 	Menu_Draw( &s_reset.menu );
 
-	UI_DrawProportionalString( SCREEN_WIDTH/2, 356 + PROP_HEIGHT * 0, "WARNING: This resets all of the", UI_CENTER|UI_SMALLFONT, color_yellow );
-	UI_DrawProportionalString( SCREEN_WIDTH/2, 356 + PROP_HEIGHT * 1, "single player game variables.", UI_CENTER|UI_SMALLFONT, color_yellow );
-	UI_DrawProportionalString( SCREEN_WIDTH/2, 356 + PROP_HEIGHT * 2, "Do this only if you want to", UI_CENTER|UI_SMALLFONT, color_yellow );
-	UI_DrawProportionalString( SCREEN_WIDTH/2, 356 + PROP_HEIGHT * 3, "start over from the beginning.", UI_CENTER|UI_SMALLFONT, color_yellow );
+	UI_DrawProportionalString( SCREEN_WIDTH / 2, 356 + PROP_HEIGHT * 0, "WARNING: This resets all of the", UI_CENTER | UI_SMALLFONT, color_yellow );
+	UI_DrawProportionalString( SCREEN_WIDTH / 2, 356 + PROP_HEIGHT * 1, "single player game variables.", UI_CENTER | UI_SMALLFONT, color_yellow );
+	UI_DrawProportionalString( SCREEN_WIDTH / 2, 356 + PROP_HEIGHT * 2, "Do this only if you want to", UI_CENTER | UI_SMALLFONT, color_yellow );
+	UI_DrawProportionalString( SCREEN_WIDTH / 2, 356 + PROP_HEIGHT * 3, "start over from the beginning.", UI_CENTER | UI_SMALLFONT, color_yellow );
 }
 
 
@@ -122,7 +128,8 @@ static void Reset_MenuDraw( void ) {
 Reset_Cache
 =================
 */
-void Reset_Cache( void ) {
+void Reset_Cache( void )
+{
 	trap_R_RegisterShaderNoMip( ART_FRAME );
 }
 
@@ -132,13 +139,14 @@ void Reset_Cache( void ) {
 UI_ResetMenu
 =================
 */
-void UI_ResetMenu(void) {
+void UI_ResetMenu( void )
+{
 	uiClientState_t	cstate;
 	int	n1, n2, n3;
 	int	l1, l2, l3;
 
 	// zero set all our globals
-	memset( &s_reset, 0, sizeof(s_reset) );
+	memset( &s_reset, 0, sizeof( s_reset ) );
 
 	Reset_Cache();
 
@@ -156,17 +164,19 @@ void UI_ResetMenu(void) {
 
 	trap_GetClientState( &cstate );
 
-	if ( cstate.connState >= CA_CONNECTED ) {
+	if( cstate.connState >= CA_CONNECTED )
+	{
 		// float on top of running game
 		s_reset.menu.fullscreen = qfalse;
 	}
-	else {
+	else
+	{
 		// game not running
 		s_reset.menu.fullscreen = qtrue;
 	}
 
-	s_reset.yes.generic.type		= MTYPE_PTEXT;      
-	s_reset.yes.generic.flags		= QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS; 
+	s_reset.yes.generic.type		= MTYPE_PTEXT;
+	s_reset.yes.generic.flags		= QMF_LEFT_JUSTIFY | QMF_PULSEIFFOCUS;
 	s_reset.yes.generic.callback	= Reset_MenuEvent;
 	s_reset.yes.generic.id			= ID_YES;
 	s_reset.yes.generic.x			= l1;
@@ -175,8 +185,8 @@ void UI_ResetMenu(void) {
 	s_reset.yes.color				= color_red;
 	s_reset.yes.style				= UI_LEFT;
 
-	s_reset.no.generic.type			= MTYPE_PTEXT;      
-	s_reset.no.generic.flags		= QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS; 
+	s_reset.no.generic.type			= MTYPE_PTEXT;
+	s_reset.no.generic.flags		= QMF_LEFT_JUSTIFY | QMF_PULSEIFFOCUS;
 	s_reset.no.generic.callback		= Reset_MenuEvent;
 	s_reset.no.generic.id			= ID_NO;
 	s_reset.no.generic.x		    = l3;
@@ -185,7 +195,7 @@ void UI_ResetMenu(void) {
 	s_reset.no.color			    = color_red;
 	s_reset.no.style			    = UI_LEFT;
 
-	Menu_AddItem( &s_reset.menu,	&s_reset.yes );             
+	Menu_AddItem( &s_reset.menu,	&s_reset.yes );
 	Menu_AddItem( &s_reset.menu,	&s_reset.no );
 
 	UI_PushMenu( &s_reset.menu );

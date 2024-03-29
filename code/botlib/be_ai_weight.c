@@ -48,7 +48,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define EVALUATERECURSIVELY
 
 #define MAX_WEIGHT_FILES			128
-weightconfig_t	*weightFileList[MAX_WEIGHT_FILES];
+weightconfig_t*	weightFileList[MAX_WEIGHT_FILES];
 
 //===========================================================================
 //
@@ -56,28 +56,31 @@ weightconfig_t	*weightFileList[MAX_WEIGHT_FILES];
 // Returns:					-
 // Changes Globals:		-
 //===========================================================================
-int ReadValue(source_t *source, float *value)
+int ReadValue( source_t* source, float* value )
 {
 	token_t token;
 
-	if (!PC_ExpectAnyToken(source, &token)) return qfalse;
-	if (!strcmp(token.string, "-"))
+	if( !PC_ExpectAnyToken( source, &token ) )
 	{
-		SourceWarning(source, "negative value set to zero");
+		return qfalse;
+	}
+	if( !strcmp( token.string, "-" ) )
+	{
+		SourceWarning( source, "negative value set to zero" );
 
-		if(!PC_ExpectAnyToken(source, &token))
+		if( !PC_ExpectAnyToken( source, &token ) )
 		{
-			SourceError(source, "Missing return value");
+			SourceError( source, "Missing return value" );
 			return qfalse;
 		}
 	}
 
-	if (token.type != TT_NUMBER)
+	if( token.type != TT_NUMBER )
 	{
-		SourceError(source, "invalid return value %s", token.string);
+		SourceError( source, "invalid return value %s", token.string );
 		return qfalse;
 	}
-	
+
 	*value = token.floatvalue;
 	return qtrue;
 } //end of the function ReadValue
@@ -87,27 +90,54 @@ int ReadValue(source_t *source, float *value)
 // Returns:					-
 // Changes Globals:		-
 //===========================================================================
-int ReadFuzzyWeight(source_t *source, fuzzyseperator_t *fs)
+int ReadFuzzyWeight( source_t* source, fuzzyseperator_t* fs )
 {
-	if (PC_CheckTokenString(source, "balance"))
+	if( PC_CheckTokenString( source, "balance" ) )
 	{
 		fs->type = WT_BALANCE;
-		if (!PC_ExpectTokenString(source, "(")) return qfalse;
-		if (!ReadValue(source, &fs->weight)) return qfalse;
-		if (!PC_ExpectTokenString(source, ",")) return qfalse;
-		if (!ReadValue(source, &fs->minweight)) return qfalse;
-		if (!PC_ExpectTokenString(source, ",")) return qfalse;
-		if (!ReadValue(source, &fs->maxweight)) return qfalse;
-		if (!PC_ExpectTokenString(source, ")")) return qfalse;
+		if( !PC_ExpectTokenString( source, "(" ) )
+		{
+			return qfalse;
+		}
+		if( !ReadValue( source, &fs->weight ) )
+		{
+			return qfalse;
+		}
+		if( !PC_ExpectTokenString( source, "," ) )
+		{
+			return qfalse;
+		}
+		if( !ReadValue( source, &fs->minweight ) )
+		{
+			return qfalse;
+		}
+		if( !PC_ExpectTokenString( source, "," ) )
+		{
+			return qfalse;
+		}
+		if( !ReadValue( source, &fs->maxweight ) )
+		{
+			return qfalse;
+		}
+		if( !PC_ExpectTokenString( source, ")" ) )
+		{
+			return qfalse;
+		}
 	} //end if
 	else
 	{
 		fs->type = 0;
-		if (!ReadValue(source, &fs->weight)) return qfalse;
+		if( !ReadValue( source, &fs->weight ) )
+		{
+			return qfalse;
+		}
 		fs->minweight = fs->weight;
 		fs->maxweight = fs->weight;
 	} //end if
-	if (!PC_ExpectTokenString(source, ";")) return qfalse;
+	if( !PC_ExpectTokenString( source, ";" ) )
+	{
+		return qfalse;
+	}
 	return qtrue;
 } //end of the function ReadFuzzyWeight
 //===========================================================================
@@ -116,12 +146,21 @@ int ReadFuzzyWeight(source_t *source, fuzzyseperator_t *fs)
 // Returns:					-
 // Changes Globals:		-
 //===========================================================================
-void FreeFuzzySeperators_r(fuzzyseperator_t *fs)
+void FreeFuzzySeperators_r( fuzzyseperator_t* fs )
 {
-	if (!fs) return;
-	if (fs->child) FreeFuzzySeperators_r(fs->child);
-	if (fs->next) FreeFuzzySeperators_r(fs->next);
-	FreeMemory(fs);
+	if( !fs )
+	{
+		return;
+	}
+	if( fs->child )
+	{
+		FreeFuzzySeperators_r( fs->child );
+	}
+	if( fs->next )
+	{
+		FreeFuzzySeperators_r( fs->next );
+	}
+	FreeMemory( fs );
 } //end of the function FreeFuzzySeperators
 //===========================================================================
 //
@@ -129,16 +168,19 @@ void FreeFuzzySeperators_r(fuzzyseperator_t *fs)
 // Returns:				-
 // Changes Globals:		-
 //===========================================================================
-void FreeWeightConfig2(weightconfig_t *config)
+void FreeWeightConfig2( weightconfig_t* config )
 {
 	int i;
 
-	for (i = 0; i < config->numweights; i++)
+	for( i = 0; i < config->numweights; i++ )
 	{
-		FreeFuzzySeperators_r(config->weights[i].firstseperator);
-		if (config->weights[i].name) FreeMemory(config->weights[i].name);
+		FreeFuzzySeperators_r( config->weights[i].firstseperator );
+		if( config->weights[i].name )
+		{
+			FreeMemory( config->weights[i].name );
+		}
 	} //end for
-	FreeMemory(config);
+	FreeMemory( config );
 } //end of the function FreeWeightConfig2
 //===========================================================================
 //
@@ -146,10 +188,13 @@ void FreeWeightConfig2(weightconfig_t *config)
 // Returns:				-
 // Changes Globals:		-
 //===========================================================================
-void FreeWeightConfig(weightconfig_t *config)
+void FreeWeightConfig( weightconfig_t* config )
 {
-	if (!LibVarGetValue("bot_reloadcharacters")) return;
-	FreeWeightConfig2(config);
+	if( !LibVarGetValue( "bot_reloadcharacters" ) )
+	{
+		return;
+	}
+	FreeWeightConfig2( config );
 } //end of the function FreeWeightConfig
 //===========================================================================
 //
@@ -157,37 +202,58 @@ void FreeWeightConfig(weightconfig_t *config)
 // Returns:				-
 // Changes Globals:		-
 //===========================================================================
-fuzzyseperator_t *ReadFuzzySeperators_r(source_t *source)
+fuzzyseperator_t* ReadFuzzySeperators_r( source_t* source )
 {
 	int newindent, index, def, founddefault;
 	token_t token;
-	fuzzyseperator_t *fs, *lastfs, *firstfs;
+	fuzzyseperator_t* fs, *lastfs, *firstfs;
 
 	founddefault = qfalse;
 	firstfs = NULL;
 	lastfs = NULL;
-	if (!PC_ExpectTokenString(source, "(")) return NULL;
-	if (!PC_ExpectTokenType(source, TT_NUMBER, TT_INTEGER, &token)) return NULL;
+	if( !PC_ExpectTokenString( source, "(" ) )
+	{
+		return NULL;
+	}
+	if( !PC_ExpectTokenType( source, TT_NUMBER, TT_INTEGER, &token ) )
+	{
+		return NULL;
+	}
 	index = token.intvalue;
-	if (!PC_ExpectTokenString(source, ")")) return NULL;
-	if (!PC_ExpectTokenString(source, "{")) return NULL;
-	if (!PC_ExpectAnyToken(source, &token)) return NULL;
+	if( !PC_ExpectTokenString( source, ")" ) )
+	{
+		return NULL;
+	}
+	if( !PC_ExpectTokenString( source, "{" ) )
+	{
+		return NULL;
+	}
+	if( !PC_ExpectAnyToken( source, &token ) )
+	{
+		return NULL;
+	}
 	do
 	{
-		def = !strcmp(token.string, "default");
-		if (def || !strcmp(token.string, "case"))
+		def = !strcmp( token.string, "default" );
+		if( def || !strcmp( token.string, "case" ) )
 		{
-			fs = (fuzzyseperator_t *) GetClearedMemory(sizeof(fuzzyseperator_t));
+			fs = ( fuzzyseperator_t* ) GetClearedMemory( sizeof( fuzzyseperator_t ) );
 			fs->index = index;
-			if (lastfs) lastfs->next = fs;
-			else firstfs = fs;
-			lastfs = fs;
-			if (def)
+			if( lastfs )
 			{
-				if (founddefault)
+				lastfs->next = fs;
+			}
+			else
+			{
+				firstfs = fs;
+			}
+			lastfs = fs;
+			if( def )
+			{
+				if( founddefault )
 				{
-					SourceError(source, "switch already has a default");
-					FreeFuzzySeperators_r(firstfs);
+					SourceError( source, "switch already has a default" );
+					FreeFuzzySeperators_r( firstfs );
 					return NULL;
 				} //end if
 				fs->value = MAX_INVENTORYVALUE;
@@ -195,83 +261,90 @@ fuzzyseperator_t *ReadFuzzySeperators_r(source_t *source)
 			} //end if
 			else
 			{
-				if (!PC_ExpectTokenType(source, TT_NUMBER, TT_INTEGER, &token))
+				if( !PC_ExpectTokenType( source, TT_NUMBER, TT_INTEGER, &token ) )
 				{
-					FreeFuzzySeperators_r(firstfs);
+					FreeFuzzySeperators_r( firstfs );
 					return NULL;
 				} //end if
 				fs->value = token.intvalue;
 			} //end else
-			if (!PC_ExpectTokenString(source, ":") || !PC_ExpectAnyToken(source, &token))
+			if( !PC_ExpectTokenString( source, ":" ) || !PC_ExpectAnyToken( source, &token ) )
 			{
-				FreeFuzzySeperators_r(firstfs);
+				FreeFuzzySeperators_r( firstfs );
 				return NULL;
 			} //end if
 			newindent = qfalse;
-			if (!strcmp(token.string, "{"))
+			if( !strcmp( token.string, "{" ) )
 			{
 				newindent = qtrue;
-				if (!PC_ExpectAnyToken(source, &token))
+				if( !PC_ExpectAnyToken( source, &token ) )
 				{
-					FreeFuzzySeperators_r(firstfs);
+					FreeFuzzySeperators_r( firstfs );
 					return NULL;
 				} //end if
 			} //end if
-			if (!strcmp(token.string, "return"))
+			if( !strcmp( token.string, "return" ) )
 			{
-				if (!ReadFuzzyWeight(source, fs))
+				if( !ReadFuzzyWeight( source, fs ) )
 				{
-					FreeFuzzySeperators_r(firstfs);
+					FreeFuzzySeperators_r( firstfs );
 					return NULL;
 				} //end if
 			} //end if
-			else if (!strcmp(token.string, "switch"))
+			else if( !strcmp( token.string, "switch" ) )
 			{
-				fs->child = ReadFuzzySeperators_r(source);
-				if (!fs->child)
+				fs->child = ReadFuzzySeperators_r( source );
+				if( !fs->child )
 				{
-					FreeFuzzySeperators_r(firstfs);
+					FreeFuzzySeperators_r( firstfs );
 					return NULL;
 				} //end if
 			} //end else if
 			else
 			{
-				SourceError(source, "invalid name %s", token.string);
+				SourceError( source, "invalid name %s", token.string );
 				return NULL;
 			} //end else
-			if (newindent)
+			if( newindent )
 			{
-				if (!PC_ExpectTokenString(source, "}"))
+				if( !PC_ExpectTokenString( source, "}" ) )
 				{
-					FreeFuzzySeperators_r(firstfs);
+					FreeFuzzySeperators_r( firstfs );
 					return NULL;
 				} //end if
 			} //end if
 		} //end if
 		else
 		{
-			FreeFuzzySeperators_r(firstfs);
-			SourceError(source, "invalid name %s", token.string);
+			FreeFuzzySeperators_r( firstfs );
+			SourceError( source, "invalid name %s", token.string );
 			return NULL;
 		} //end else
-		if (!PC_ExpectAnyToken(source, &token))
+		if( !PC_ExpectAnyToken( source, &token ) )
 		{
-			FreeFuzzySeperators_r(firstfs);
+			FreeFuzzySeperators_r( firstfs );
 			return NULL;
 		} //end if
-	} while(strcmp(token.string, "}"));
+	}
+	while( strcmp( token.string, "}" ) );
 	//
-	if (!founddefault)
+	if( !founddefault )
 	{
-		SourceWarning(source, "switch without default");
-		fs = (fuzzyseperator_t *) GetClearedMemory(sizeof(fuzzyseperator_t));
+		SourceWarning( source, "switch without default" );
+		fs = ( fuzzyseperator_t* ) GetClearedMemory( sizeof( fuzzyseperator_t ) );
 		fs->index = index;
 		fs->value = MAX_INVENTORYVALUE;
 		fs->weight = 0;
 		fs->next = NULL;
 		fs->child = NULL;
-		if (lastfs) lastfs->next = fs;
-		else firstfs = fs;
+		if( lastfs )
+		{
+			lastfs->next = fs;
+		}
+		else
+		{
+			firstfs = fs;
+		}
 	} //end if
 	//
 	return firstfs;
@@ -282,20 +355,20 @@ fuzzyseperator_t *ReadFuzzySeperators_r(source_t *source)
 // Returns:					-
 // Changes Globals:		-
 //===========================================================================
-weightconfig_t *ReadWeightConfig(char *filename)
+weightconfig_t* ReadWeightConfig( char* filename )
 {
 	int newindent, avail = 0, n;
 	token_t token;
-	source_t *source;
-	fuzzyseperator_t *fs;
-	weightconfig_t *config = NULL;
+	source_t* source;
+	fuzzyseperator_t* fs;
+	weightconfig_t* config = NULL;
 #ifdef DEBUG
 	int starttime;
 
 	starttime = Sys_MilliSeconds();
 #endif //DEBUG
 
-	if (!LibVarGetValue("bot_reloadcharacters"))
+	if( !LibVarGetValue( "bot_reloadcharacters" ) )
 	{
 		avail = -1;
 		for( n = 0; n < MAX_WEIGHT_FILES; n++ )
@@ -323,93 +396,93 @@ weightconfig_t *ReadWeightConfig(char *filename)
 		} //end if
 	} //end if
 
-	PC_SetBaseFolder(BOTFILESBASEFOLDER);
-	source = LoadSourceFile(filename);
-	if (!source)
+	PC_SetBaseFolder( BOTFILESBASEFOLDER );
+	source = LoadSourceFile( filename );
+	if( !source )
 	{
-		botimport.Print(PRT_ERROR, "counldn't load %s\n", filename);
+		botimport.Print( PRT_ERROR, "counldn't load %s\n", filename );
 		return NULL;
 	} //end if
 	//
-	config = (weightconfig_t *) GetClearedMemory(sizeof(weightconfig_t));
+	config = ( weightconfig_t* ) GetClearedMemory( sizeof( weightconfig_t ) );
 	config->numweights = 0;
-	Q_strncpyz( config->filename, filename, sizeof(config->filename) );
+	Q_strncpyz( config->filename, filename, sizeof( config->filename ) );
 	//parse the item config file
-	while(PC_ReadToken(source, &token))
+	while( PC_ReadToken( source, &token ) )
 	{
-		if (!strcmp(token.string, "weight"))
+		if( !strcmp( token.string, "weight" ) )
 		{
-			if (config->numweights >= MAX_WEIGHTS)
+			if( config->numweights >= MAX_WEIGHTS )
 			{
-				SourceWarning(source, "too many fuzzy weights");
+				SourceWarning( source, "too many fuzzy weights" );
 				break;
 			} //end if
-			if (!PC_ExpectTokenType(source, TT_STRING, 0, &token))
+			if( !PC_ExpectTokenType( source, TT_STRING, 0, &token ) )
 			{
-				FreeWeightConfig(config);
-				FreeSource(source);
+				FreeWeightConfig( config );
+				FreeSource( source );
 				return NULL;
 			} //end if
-			StripDoubleQuotes(token.string);
-			config->weights[config->numweights].name = (char *) GetClearedMemory(strlen(token.string) + 1);
-			strcpy(config->weights[config->numweights].name, token.string);
-			if (!PC_ExpectAnyToken(source, &token))
+			StripDoubleQuotes( token.string );
+			config->weights[config->numweights].name = ( char* ) GetClearedMemory( strlen( token.string ) + 1 );
+			strcpy( config->weights[config->numweights].name, token.string );
+			if( !PC_ExpectAnyToken( source, &token ) )
 			{
-				FreeWeightConfig(config);
-				FreeSource(source);
+				FreeWeightConfig( config );
+				FreeSource( source );
 				return NULL;
 			} //end if
 			newindent = qfalse;
-			if (!strcmp(token.string, "{"))
+			if( !strcmp( token.string, "{" ) )
 			{
 				newindent = qtrue;
-				if (!PC_ExpectAnyToken(source, &token))
+				if( !PC_ExpectAnyToken( source, &token ) )
 				{
-					FreeWeightConfig(config);
-					FreeSource(source);
+					FreeWeightConfig( config );
+					FreeSource( source );
 					return NULL;
 				} //end if
 			} //end if
-			if (!strcmp(token.string, "switch"))
+			if( !strcmp( token.string, "switch" ) )
 			{
-				fs = ReadFuzzySeperators_r(source);
-				if (!fs)
+				fs = ReadFuzzySeperators_r( source );
+				if( !fs )
 				{
-					FreeWeightConfig(config);
-					FreeSource(source);
+					FreeWeightConfig( config );
+					FreeSource( source );
 					return NULL;
 				} //end if
 				config->weights[config->numweights].firstseperator = fs;
 			} //end if
-			else if (!strcmp(token.string, "return"))
+			else if( !strcmp( token.string, "return" ) )
 			{
-				fs = (fuzzyseperator_t *) GetClearedMemory(sizeof(fuzzyseperator_t));
+				fs = ( fuzzyseperator_t* ) GetClearedMemory( sizeof( fuzzyseperator_t ) );
 				fs->index = 0;
 				fs->value = MAX_INVENTORYVALUE;
 				fs->next = NULL;
 				fs->child = NULL;
-				if (!ReadFuzzyWeight(source, fs))
+				if( !ReadFuzzyWeight( source, fs ) )
 				{
-					FreeMemory(fs);
-					FreeWeightConfig(config);
-					FreeSource(source);
+					FreeMemory( fs );
+					FreeWeightConfig( config );
+					FreeSource( source );
 					return NULL;
 				} //end if
 				config->weights[config->numweights].firstseperator = fs;
 			} //end else if
 			else
 			{
-				SourceError(source, "invalid name %s", token.string);
-				FreeWeightConfig(config);
-				FreeSource(source);
+				SourceError( source, "invalid name %s", token.string );
+				FreeWeightConfig( config );
+				FreeSource( source );
 				return NULL;
 			} //end else
-			if (newindent)
+			if( newindent )
 			{
-				if (!PC_ExpectTokenString(source, "}"))
+				if( !PC_ExpectTokenString( source, "}" ) )
 				{
-					FreeWeightConfig(config);
-					FreeSource(source);
+					FreeWeightConfig( config );
+					FreeSource( source );
 					return NULL;
 				} //end if
 			} //end if
@@ -417,24 +490,24 @@ weightconfig_t *ReadWeightConfig(char *filename)
 		} //end if
 		else
 		{
-			SourceError(source, "invalid name %s", token.string);
-			FreeWeightConfig(config);
-			FreeSource(source);
+			SourceError( source, "invalid name %s", token.string );
+			FreeWeightConfig( config );
+			FreeSource( source );
 			return NULL;
 		} //end else
 	} //end while
 	//free the source at the end of a pass
-	FreeSource(source);
+	FreeSource( source );
 	//if the file was located in a pak file
-	botimport.Print(PRT_MESSAGE, "loaded %s\n", filename);
+	botimport.Print( PRT_MESSAGE, "loaded %s\n", filename );
 #ifdef DEBUG
-	if (botDeveloper)
+	if( botDeveloper )
 	{
-		botimport.Print(PRT_MESSAGE, "weights loaded in %d msec\n", Sys_MilliSeconds() - starttime);
+		botimport.Print( PRT_MESSAGE, "weights loaded in %d msec\n", Sys_MilliSeconds() - starttime );
 	} //end if
 #endif //DEBUG
 	//
-	if (!LibVarGetValue("bot_reloadcharacters"))
+	if( !LibVarGetValue( "bot_reloadcharacters" ) )
 	{
 		weightFileList[avail] = config;
 	} //end if
@@ -448,23 +521,53 @@ weightconfig_t *ReadWeightConfig(char *filename)
 // Returns:					-
 // Changes Globals:		-
 //===========================================================================
-qboolean WriteFuzzyWeight(FILE *fp, fuzzyseperator_t *fs)
+qboolean WriteFuzzyWeight( FILE* fp, fuzzyseperator_t* fs )
 {
-	if (fs->type == WT_BALANCE)
+	if( fs->type == WT_BALANCE )
 	{
-		if (fprintf(fp, " return balance(") < 0) return qfalse;
-		if (!WriteFloat(fp, fs->weight)) return qfalse;
-		if (fprintf(fp, ",") < 0) return qfalse;
-		if (!WriteFloat(fp, fs->minweight)) return qfalse;
-		if (fprintf(fp, ",") < 0) return qfalse;
-		if (!WriteFloat(fp, fs->maxweight)) return qfalse;
-		if (fprintf(fp, ");\n") < 0) return qfalse;
+		if( fprintf( fp, " return balance(" ) < 0 )
+		{
+			return qfalse;
+		}
+		if( !WriteFloat( fp, fs->weight ) )
+		{
+			return qfalse;
+		}
+		if( fprintf( fp, "," ) < 0 )
+		{
+			return qfalse;
+		}
+		if( !WriteFloat( fp, fs->minweight ) )
+		{
+			return qfalse;
+		}
+		if( fprintf( fp, "," ) < 0 )
+		{
+			return qfalse;
+		}
+		if( !WriteFloat( fp, fs->maxweight ) )
+		{
+			return qfalse;
+		}
+		if( fprintf( fp, ");\n" ) < 0 )
+		{
+			return qfalse;
+		}
 	} //end if
 	else
 	{
-		if (fprintf(fp, " return ") < 0) return qfalse;
-		if (!WriteFloat(fp, fs->weight)) return qfalse;
-		if (fprintf(fp, ";\n") < 0) return qfalse;
+		if( fprintf( fp, " return " ) < 0 )
+		{
+			return qfalse;
+		}
+		if( !WriteFloat( fp, fs->weight ) )
+		{
+			return qfalse;
+		}
+		if( fprintf( fp, ";\n" ) < 0 )
+		{
+			return qfalse;
+		}
 	} //end else
 	return qtrue;
 } //end of the function WriteFuzzyWeight
@@ -474,49 +577,101 @@ qboolean WriteFuzzyWeight(FILE *fp, fuzzyseperator_t *fs)
 // Returns:					-
 // Changes Globals:		-
 //===========================================================================
-qboolean WriteFuzzySeperators_r(FILE *fp, fuzzyseperator_t *fs, int indent)
+qboolean WriteFuzzySeperators_r( FILE* fp, fuzzyseperator_t* fs, int indent )
 {
-	if (!WriteIndent(fp, indent)) return qfalse;
-	if (fprintf(fp, "switch(%d)\n", fs->index) < 0) return qfalse;
-	if (!WriteIndent(fp, indent)) return qfalse;
-	if (fprintf(fp, "{\n") < 0) return qfalse;
+	if( !WriteIndent( fp, indent ) )
+	{
+		return qfalse;
+	}
+	if( fprintf( fp, "switch(%d)\n", fs->index ) < 0 )
+	{
+		return qfalse;
+	}
+	if( !WriteIndent( fp, indent ) )
+	{
+		return qfalse;
+	}
+	if( fprintf( fp, "{\n" ) < 0 )
+	{
+		return qfalse;
+	}
 	indent++;
 	do
 	{
-		if (!WriteIndent(fp, indent)) return qfalse;
-		if (fs->next)
+		if( !WriteIndent( fp, indent ) )
 		{
-			if (fprintf(fp, "case %d:", fs->value) < 0) return qfalse;
+			return qfalse;
+		}
+		if( fs->next )
+		{
+			if( fprintf( fp, "case %d:", fs->value ) < 0 )
+			{
+				return qfalse;
+			}
 		} //end if
 		else
 		{
-			if (fprintf(fp, "default:") < 0) return qfalse;
-		} //end else
-		if (fs->child)
-		{
-			if (fprintf(fp, "\n") < 0) return qfalse;
-			if (!WriteIndent(fp, indent)) return qfalse;
-			if (fprintf(fp, "{\n") < 0) return qfalse;
-			if (!WriteFuzzySeperators_r(fp, fs->child, indent + 1)) return qfalse;
-			if (!WriteIndent(fp, indent)) return qfalse;
-			if (fs->next)
+			if( fprintf( fp, "default:" ) < 0 )
 			{
-				if (fprintf(fp, "} //end case\n") < 0) return qfalse;
+				return qfalse;
+			}
+		} //end else
+		if( fs->child )
+		{
+			if( fprintf( fp, "\n" ) < 0 )
+			{
+				return qfalse;
+			}
+			if( !WriteIndent( fp, indent ) )
+			{
+				return qfalse;
+			}
+			if( fprintf( fp, "{\n" ) < 0 )
+			{
+				return qfalse;
+			}
+			if( !WriteFuzzySeperators_r( fp, fs->child, indent + 1 ) )
+			{
+				return qfalse;
+			}
+			if( !WriteIndent( fp, indent ) )
+			{
+				return qfalse;
+			}
+			if( fs->next )
+			{
+				if( fprintf( fp, "} //end case\n" ) < 0 )
+				{
+					return qfalse;
+				}
 			} //end if
 			else
 			{
-				if (fprintf(fp, "} //end default\n") < 0) return qfalse;
+				if( fprintf( fp, "} //end default\n" ) < 0 )
+				{
+					return qfalse;
+				}
 			} //end else
 		} //end if
 		else
 		{
-			if (!WriteFuzzyWeight(fp, fs)) return qfalse;
+			if( !WriteFuzzyWeight( fp, fs ) )
+			{
+				return qfalse;
+			}
 		} //end else
 		fs = fs->next;
-	} while(fs);
+	}
+	while( fs );
 	indent--;
-	if (!WriteIndent(fp, indent)) return qfalse;
-	if (fprintf(fp, "} //end switch\n") < 0) return qfalse;
+	if( !WriteIndent( fp, indent ) )
+	{
+		return qfalse;
+	}
+	if( fprintf( fp, "} //end switch\n" ) < 0 )
+	{
+		return qfalse;
+	}
 	return qtrue;
 } //end of the function WriteItemFuzzyWeights_r
 //===========================================================================
@@ -525,32 +680,53 @@ qboolean WriteFuzzySeperators_r(FILE *fp, fuzzyseperator_t *fs, int indent)
 // Returns:					-
 // Changes Globals:		-
 //===========================================================================
-qboolean WriteWeightConfig(char *filename, weightconfig_t *config)
+qboolean WriteWeightConfig( char* filename, weightconfig_t* config )
 {
 	int i;
-	FILE *fp;
-	weight_t *ifw;
+	FILE* fp;
+	weight_t* ifw;
 
-	fp = fopen(filename, "wb");
-	if (!fp) return qfalse;
+	fp = fopen( filename, "wb" );
+	if( !fp )
+	{
+		return qfalse;
+	}
 
-	for (i = 0; i < config->numweights; i++)
+	for( i = 0; i < config->numweights; i++ )
 	{
 		ifw = &config->weights[i];
-		if (fprintf(fp, "\nweight \"%s\"\n", ifw->name) < 0) return qfalse;
-		if (fprintf(fp, "{\n") < 0) return qfalse;
-		if (ifw->firstseperator->index > 0)
+		if( fprintf( fp, "\nweight \"%s\"\n", ifw->name ) < 0 )
 		{
-			if (!WriteFuzzySeperators_r(fp, ifw->firstseperator, 1)) return qfalse;
+			return qfalse;
+		}
+		if( fprintf( fp, "{\n" ) < 0 )
+		{
+			return qfalse;
+		}
+		if( ifw->firstseperator->index > 0 )
+		{
+			if( !WriteFuzzySeperators_r( fp, ifw->firstseperator, 1 ) )
+			{
+				return qfalse;
+			}
 		} //end if
 		else
 		{
-			if (!WriteIndent(fp, 1)) return qfalse;
-			if (!WriteFuzzyWeight(fp, ifw->firstseperator)) return qfalse;
+			if( !WriteIndent( fp, 1 ) )
+			{
+				return qfalse;
+			}
+			if( !WriteFuzzyWeight( fp, ifw->firstseperator ) )
+			{
+				return qfalse;
+			}
 		} //end else
-		if (fprintf(fp, "} //end weight\n") < 0) return qfalse;
+		if( fprintf( fp, "} //end weight\n" ) < 0 )
+		{
+			return qfalse;
+		}
 	} //end for
-	fclose(fp);
+	fclose( fp );
 	return qtrue;
 } //end of the function WriteWeightConfig
 #endif
@@ -560,13 +736,13 @@ qboolean WriteWeightConfig(char *filename, weightconfig_t *config)
 // Returns:					-
 // Changes Globals:		-
 //===========================================================================
-int FindFuzzyWeight(weightconfig_t *wc, char *name)
+int FindFuzzyWeight( weightconfig_t* wc, char* name )
 {
 	int i;
 
-	for (i = 0; i < wc->numweights; i++)
+	for( i = 0; i < wc->numweights; i++ )
 	{
-		if (!strcmp(wc->weights[i].name, name))
+		if( !strcmp( wc->weights[i].name, name ) )
 		{
 			return i;
 		} //end if
@@ -579,34 +755,56 @@ int FindFuzzyWeight(weightconfig_t *wc, char *name)
 // Returns:					-
 // Changes Globals:		-
 //===========================================================================
-float FuzzyWeight_r(int *inventory, fuzzyseperator_t *fs)
+float FuzzyWeight_r( int* inventory, fuzzyseperator_t* fs )
 {
 	float scale, w1, w2;
 
-	if (inventory[fs->index] < fs->value)
+	if( inventory[fs->index] < fs->value )
 	{
-		if (fs->child) return FuzzyWeight_r(inventory, fs->child);
-		else return fs->weight;
+		if( fs->child )
+		{
+			return FuzzyWeight_r( inventory, fs->child );
+		}
+		else
+		{
+			return fs->weight;
+		}
 	} //end if
-	else if (fs->next)
+	else if( fs->next )
 	{
-		if (inventory[fs->index] < fs->next->value)
+		if( inventory[fs->index] < fs->next->value )
 		{
 			//first weight
-			if (fs->child) w1 = FuzzyWeight_r(inventory, fs->child);
-			else w1 = fs->weight;
-			//second weight
-			if (fs->next->child) w2 = FuzzyWeight_r(inventory, fs->next->child);
-			else w2 = fs->next->weight;
-			//the scale factor
-			if(fs->next->value == MAX_INVENTORYVALUE) // is fs->next the default case?
-        		return w2;      // can't interpolate, return default weight
+			if( fs->child )
+			{
+				w1 = FuzzyWeight_r( inventory, fs->child );
+			}
 			else
-				scale = (float) (inventory[fs->index] - fs->value) / (fs->next->value - fs->value);
+			{
+				w1 = fs->weight;
+			}
+			//second weight
+			if( fs->next->child )
+			{
+				w2 = FuzzyWeight_r( inventory, fs->next->child );
+			}
+			else
+			{
+				w2 = fs->next->weight;
+			}
+			//the scale factor
+			if( fs->next->value == MAX_INVENTORYVALUE ) // is fs->next the default case?
+			{
+				return w2;    // can't interpolate, return default weight
+			}
+			else
+			{
+				scale = ( float )( inventory[fs->index] - fs->value ) / ( fs->next->value - fs->value );
+			}
 			//scale between the two weights
-			return (1 - scale) * w1 + scale * w2;
+			return ( 1 - scale ) * w1 + scale * w2;
 		} //end if
-		return FuzzyWeight_r(inventory, fs->next);
+		return FuzzyWeight_r( inventory, fs->next );
 	} //end else if
 	return fs->weight;
 } //end of the function FuzzyWeight_r
@@ -616,34 +814,56 @@ float FuzzyWeight_r(int *inventory, fuzzyseperator_t *fs)
 // Returns:					-
 // Changes Globals:		-
 //===========================================================================
-float FuzzyWeightUndecided_r(int *inventory, fuzzyseperator_t *fs)
+float FuzzyWeightUndecided_r( int* inventory, fuzzyseperator_t* fs )
 {
 	float scale, w1, w2;
 
-	if (inventory[fs->index] < fs->value)
+	if( inventory[fs->index] < fs->value )
 	{
-		if (fs->child) return FuzzyWeightUndecided_r(inventory, fs->child);
-		else return fs->minweight + random() * (fs->maxweight - fs->minweight);
+		if( fs->child )
+		{
+			return FuzzyWeightUndecided_r( inventory, fs->child );
+		}
+		else
+		{
+			return fs->minweight + random() * ( fs->maxweight - fs->minweight );
+		}
 	} //end if
-	else if (fs->next)
+	else if( fs->next )
 	{
-		if (inventory[fs->index] < fs->next->value)
+		if( inventory[fs->index] < fs->next->value )
 		{
 			//first weight
-			if (fs->child) w1 = FuzzyWeightUndecided_r(inventory, fs->child);
-			else w1 = fs->minweight + random() * (fs->maxweight - fs->minweight);
-			//second weight
-			if (fs->next->child) w2 = FuzzyWeight_r(inventory, fs->next->child);
-			else w2 = fs->next->minweight + random() * (fs->next->maxweight - fs->next->minweight);
-			//the scale factor
-			if(fs->next->value == MAX_INVENTORYVALUE) // is fs->next the default case?
-        		return w2;      // can't interpolate, return default weight
+			if( fs->child )
+			{
+				w1 = FuzzyWeightUndecided_r( inventory, fs->child );
+			}
 			else
-				scale = (float) (inventory[fs->index] - fs->value) / (fs->next->value - fs->value);
+			{
+				w1 = fs->minweight + random() * ( fs->maxweight - fs->minweight );
+			}
+			//second weight
+			if( fs->next->child )
+			{
+				w2 = FuzzyWeight_r( inventory, fs->next->child );
+			}
+			else
+			{
+				w2 = fs->next->minweight + random() * ( fs->next->maxweight - fs->next->minweight );
+			}
+			//the scale factor
+			if( fs->next->value == MAX_INVENTORYVALUE ) // is fs->next the default case?
+			{
+				return w2;    // can't interpolate, return default weight
+			}
+			else
+			{
+				scale = ( float )( inventory[fs->index] - fs->value ) / ( fs->next->value - fs->value );
+			}
 			//scale between the two weights
-			return (1 - scale) * w1 + scale * w2;
+			return ( 1 - scale ) * w1 + scale * w2;
 		} //end if
-		return FuzzyWeightUndecided_r(inventory, fs->next);
+		return FuzzyWeightUndecided_r( inventory, fs->next );
 	} //end else if
 	return fs->weight;
 } //end of the function FuzzyWeightUndecided_r
@@ -653,26 +873,41 @@ float FuzzyWeightUndecided_r(int *inventory, fuzzyseperator_t *fs)
 // Returns:					-
 // Changes Globals:		-
 //===========================================================================
-float FuzzyWeight(int *inventory, weightconfig_t *wc, int weightnum)
+float FuzzyWeight( int* inventory, weightconfig_t* wc, int weightnum )
 {
 #ifdef EVALUATERECURSIVELY
-	return FuzzyWeight_r(inventory, wc->weights[weightnum].firstseperator);
+	return FuzzyWeight_r( inventory, wc->weights[weightnum].firstseperator );
 #else
-	fuzzyseperator_t *s;
+	fuzzyseperator_t* s;
 
 	s = wc->weights[weightnum].firstseperator;
-	if (!s) return 0;
-	while(1)
+	if( !s )
 	{
-		if (inventory[s->index] < s->value)
+		return 0;
+	}
+	while( 1 )
+	{
+		if( inventory[s->index] < s->value )
 		{
-			if (s->child) s = s->child;
-			else return s->weight;
+			if( s->child )
+			{
+				s = s->child;
+			}
+			else
+			{
+				return s->weight;
+			}
 		} //end if
 		else
 		{
-			if (s->next) s = s->next;
-			else return s->weight;
+			if( s->next )
+			{
+				s = s->next;
+			}
+			else
+			{
+				return s->weight;
+			}
 		} //end else
 	} //end if
 	return 0;
@@ -684,26 +919,41 @@ float FuzzyWeight(int *inventory, weightconfig_t *wc, int weightnum)
 // Returns:					-
 // Changes Globals:		-
 //===========================================================================
-float FuzzyWeightUndecided(int *inventory, weightconfig_t *wc, int weightnum)
+float FuzzyWeightUndecided( int* inventory, weightconfig_t* wc, int weightnum )
 {
 #ifdef EVALUATERECURSIVELY
-	return FuzzyWeightUndecided_r(inventory, wc->weights[weightnum].firstseperator);
+	return FuzzyWeightUndecided_r( inventory, wc->weights[weightnum].firstseperator );
 #else
-	fuzzyseperator_t *s;
+	fuzzyseperator_t* s;
 
 	s = wc->weights[weightnum].firstseperator;
-	if (!s) return 0;
-	while(1)
+	if( !s )
 	{
-		if (inventory[s->index] < s->value)
+		return 0;
+	}
+	while( 1 )
+	{
+		if( inventory[s->index] < s->value )
 		{
-			if (s->child) s = s->child;
-			else return s->minweight + random() * (s->maxweight - s->minweight);
+			if( s->child )
+			{
+				s = s->child;
+			}
+			else
+			{
+				return s->minweight + random() * ( s->maxweight - s->minweight );
+			}
 		} //end if
 		else
 		{
-			if (s->next) s = s->next;
-			else return s->minweight + random() * (s->maxweight - s->minweight);
+			if( s->next )
+			{
+				s = s->next;
+			}
+			else
+			{
+				return s->minweight + random() * ( s->maxweight - s->minweight );
+			}
 		} //end else
 	} //end if
 	return 0;
@@ -715,22 +965,37 @@ float FuzzyWeightUndecided(int *inventory, weightconfig_t *wc, int weightnum)
 // Returns:					-
 // Changes Globals:		-
 //===========================================================================
-void EvolveFuzzySeperator_r(fuzzyseperator_t *fs)
+void EvolveFuzzySeperator_r( fuzzyseperator_t* fs )
 {
-	if (fs->child)
+	if( fs->child )
 	{
-		EvolveFuzzySeperator_r(fs->child);
+		EvolveFuzzySeperator_r( fs->child );
 	} //end if
-	else if (fs->type == WT_BALANCE)
+	else if( fs->type == WT_BALANCE )
 	{
 		//every once in a while an evolution leap occurs, mutation
-		if (random() < 0.01) fs->weight += crandom() * (fs->maxweight - fs->minweight);
-		else fs->weight += crandom() * (fs->maxweight - fs->minweight) * 0.5;
+		if( random() < 0.01 )
+		{
+			fs->weight += crandom() * ( fs->maxweight - fs->minweight );
+		}
+		else
+		{
+			fs->weight += crandom() * ( fs->maxweight - fs->minweight ) * 0.5;
+		}
 		//modify bounds if necessary because of mutation
-		if (fs->weight < fs->minweight) fs->minweight = fs->weight;
-		else if (fs->weight > fs->maxweight) fs->maxweight = fs->weight;
+		if( fs->weight < fs->minweight )
+		{
+			fs->minweight = fs->weight;
+		}
+		else if( fs->weight > fs->maxweight )
+		{
+			fs->maxweight = fs->weight;
+		}
 	} //end else if
-	if (fs->next) EvolveFuzzySeperator_r(fs->next);
+	if( fs->next )
+	{
+		EvolveFuzzySeperator_r( fs->next );
+	}
 } //end of the function EvolveFuzzySeperator_r
 //===========================================================================
 //
@@ -738,13 +1003,13 @@ void EvolveFuzzySeperator_r(fuzzyseperator_t *fs)
 // Returns:					-
 // Changes Globals:		-
 //===========================================================================
-void EvolveWeightConfig(weightconfig_t *config)
+void EvolveWeightConfig( weightconfig_t* config )
 {
 	int i;
 
-	for (i = 0; i < config->numweights; i++)
+	for( i = 0; i < config->numweights; i++ )
 	{
-		EvolveFuzzySeperator_r(config->weights[i].firstseperator);
+		EvolveFuzzySeperator_r( config->weights[i].firstseperator );
 	} //end for
 } //end of the function EvolveWeightConfig
 //===========================================================================
@@ -753,21 +1018,30 @@ void EvolveWeightConfig(weightconfig_t *config)
 // Returns:					-
 // Changes Globals:		-
 //===========================================================================
-void ScaleFuzzySeperator_r(fuzzyseperator_t *fs, float scale)
+void ScaleFuzzySeperator_r( fuzzyseperator_t* fs, float scale )
 {
-	if (fs->child)
+	if( fs->child )
 	{
-		ScaleFuzzySeperator_r(fs->child, scale);
+		ScaleFuzzySeperator_r( fs->child, scale );
 	} //end if
-	else if (fs->type == WT_BALANCE)
+	else if( fs->type == WT_BALANCE )
 	{
 		//
-		fs->weight = (float) (fs->maxweight + fs->minweight) * scale;
+		fs->weight = ( float )( fs->maxweight + fs->minweight ) * scale;
 		//get the weight between bounds
-		if (fs->weight < fs->minweight) fs->weight = fs->minweight;
-		else if (fs->weight > fs->maxweight) fs->weight = fs->maxweight;
+		if( fs->weight < fs->minweight )
+		{
+			fs->weight = fs->minweight;
+		}
+		else if( fs->weight > fs->maxweight )
+		{
+			fs->weight = fs->maxweight;
+		}
 	} //end else if
-	if (fs->next) ScaleFuzzySeperator_r(fs->next, scale);
+	if( fs->next )
+	{
+		ScaleFuzzySeperator_r( fs->next, scale );
+	}
 } //end of the function ScaleFuzzySeperator_r
 //===========================================================================
 //
@@ -775,17 +1049,23 @@ void ScaleFuzzySeperator_r(fuzzyseperator_t *fs, float scale)
 // Returns:					-
 // Changes Globals:		-
 //===========================================================================
-void ScaleWeight(weightconfig_t *config, char *name, float scale)
+void ScaleWeight( weightconfig_t* config, char* name, float scale )
 {
 	int i;
 
-	if (scale < 0) scale = 0;
-	else if (scale > 1) scale = 1;
-	for (i = 0; i < config->numweights; i++)
+	if( scale < 0 )
 	{
-		if (!strcmp(name, config->weights[i].name))
+		scale = 0;
+	}
+	else if( scale > 1 )
+	{
+		scale = 1;
+	}
+	for( i = 0; i < config->numweights; i++ )
+	{
+		if( !strcmp( name, config->weights[i].name ) )
 		{
-			ScaleFuzzySeperator_r(config->weights[i].firstseperator, scale);
+			ScaleFuzzySeperator_r( config->weights[i].firstseperator, scale );
 			break;
 		} //end if
 	} //end for
@@ -796,24 +1076,27 @@ void ScaleWeight(weightconfig_t *config, char *name, float scale)
 // Returns:					-
 // Changes Globals:		-
 //===========================================================================
-void ScaleFuzzySeperatorBalanceRange_r(fuzzyseperator_t *fs, float scale)
+void ScaleFuzzySeperatorBalanceRange_r( fuzzyseperator_t* fs, float scale )
 {
-	if (fs->child)
+	if( fs->child )
 	{
-		ScaleFuzzySeperatorBalanceRange_r(fs->child, scale);
+		ScaleFuzzySeperatorBalanceRange_r( fs->child, scale );
 	} //end if
-	else if (fs->type == WT_BALANCE)
+	else if( fs->type == WT_BALANCE )
 	{
-		float mid = (fs->minweight + fs->maxweight) * 0.5;
+		float mid = ( fs->minweight + fs->maxweight ) * 0.5;
 		//get the weight between bounds
-		fs->maxweight = mid + (fs->maxweight - mid) * scale;
-		fs->minweight = mid + (fs->minweight - mid) * scale;
-		if (fs->maxweight < fs->minweight)
+		fs->maxweight = mid + ( fs->maxweight - mid ) * scale;
+		fs->minweight = mid + ( fs->minweight - mid ) * scale;
+		if( fs->maxweight < fs->minweight )
 		{
 			fs->maxweight = fs->minweight;
 		} //end if
 	} //end else if
-	if (fs->next) ScaleFuzzySeperatorBalanceRange_r(fs->next, scale);
+	if( fs->next )
+	{
+		ScaleFuzzySeperatorBalanceRange_r( fs->next, scale );
+	}
 } //end of the function ScaleFuzzySeperatorBalanceRange_r
 //===========================================================================
 //
@@ -821,15 +1104,21 @@ void ScaleFuzzySeperatorBalanceRange_r(fuzzyseperator_t *fs, float scale)
 // Returns:					-
 // Changes Globals:		-
 //===========================================================================
-void ScaleFuzzyBalanceRange(weightconfig_t *config, float scale)
+void ScaleFuzzyBalanceRange( weightconfig_t* config, float scale )
 {
 	int i;
 
-	if (scale < 0) scale = 0;
-	else if (scale > 100) scale = 100;
-	for (i = 0; i < config->numweights; i++)
+	if( scale < 0 )
 	{
-		ScaleFuzzySeperatorBalanceRange_r(config->weights[i].firstseperator, scale);
+		scale = 0;
+	}
+	else if( scale > 100 )
+	{
+		scale = 100;
+	}
+	for( i = 0; i < config->numweights; i++ )
+	{
+		ScaleFuzzySeperatorBalanceRange_r( config->weights[i].firstseperator, scale );
 	} //end for
 } //end of the function ScaleFuzzyBalanceRange
 //===========================================================================
@@ -838,40 +1127,46 @@ void ScaleFuzzyBalanceRange(weightconfig_t *config, float scale)
 // Returns:					-
 // Changes Globals:		-
 //===========================================================================
-int InterbreedFuzzySeperator_r(fuzzyseperator_t *fs1, fuzzyseperator_t *fs2,
-								fuzzyseperator_t *fsout)
+int InterbreedFuzzySeperator_r( fuzzyseperator_t* fs1, fuzzyseperator_t* fs2,
+								fuzzyseperator_t* fsout )
 {
-	if (fs1->child)
+	if( fs1->child )
 	{
-		if (!fs2->child || !fsout->child)
+		if( !fs2->child || !fsout->child )
 		{
-			botimport.Print(PRT_ERROR, "cannot interbreed weight configs, unequal child\n");
+			botimport.Print( PRT_ERROR, "cannot interbreed weight configs, unequal child\n" );
 			return qfalse;
 		} //end if
-		if (!InterbreedFuzzySeperator_r(fs2->child, fs2->child, fsout->child))
+		if( !InterbreedFuzzySeperator_r( fs2->child, fs2->child, fsout->child ) )
 		{
 			return qfalse;
 		} //end if
 	} //end if
-	else if (fs1->type == WT_BALANCE)
+	else if( fs1->type == WT_BALANCE )
 	{
-		if (fs2->type != WT_BALANCE || fsout->type != WT_BALANCE)
+		if( fs2->type != WT_BALANCE || fsout->type != WT_BALANCE )
 		{
-			botimport.Print(PRT_ERROR, "cannot interbreed weight configs, unequal balance\n");
+			botimport.Print( PRT_ERROR, "cannot interbreed weight configs, unequal balance\n" );
 			return qfalse;
 		} //end if
-		fsout->weight = (fs1->weight + fs2->weight) / 2;
-		if (fsout->weight > fsout->maxweight) fsout->maxweight = fsout->weight;
-		if (fsout->weight > fsout->minweight) fsout->minweight = fsout->weight;
+		fsout->weight = ( fs1->weight + fs2->weight ) / 2;
+		if( fsout->weight > fsout->maxweight )
+		{
+			fsout->maxweight = fsout->weight;
+		}
+		if( fsout->weight > fsout->minweight )
+		{
+			fsout->minweight = fsout->weight;
+		}
 	} //end else if
-	if (fs1->next)
+	if( fs1->next )
 	{
-		if (!fs2->next || !fsout->next)
+		if( !fs2->next || !fsout->next )
 		{
-			botimport.Print(PRT_ERROR, "cannot interbreed weight configs, unequal next\n");
+			botimport.Print( PRT_ERROR, "cannot interbreed weight configs, unequal next\n" );
 			return qfalse;
 		} //end if
-		if (!InterbreedFuzzySeperator_r(fs1->next, fs2->next, fsout->next))
+		if( !InterbreedFuzzySeperator_r( fs1->next, fs2->next, fsout->next ) )
 		{
 			return qfalse;
 		} //end if
@@ -885,22 +1180,22 @@ int InterbreedFuzzySeperator_r(fuzzyseperator_t *fs1, fuzzyseperator_t *fs2,
 // Returns:					-
 // Changes Globals:		-
 //===========================================================================
-void InterbreedWeightConfigs(weightconfig_t *config1, weightconfig_t *config2,
-								weightconfig_t *configout)
+void InterbreedWeightConfigs( weightconfig_t* config1, weightconfig_t* config2,
+							  weightconfig_t* configout )
 {
 	int i;
 
-	if (config1->numweights != config2->numweights ||
-		config1->numweights != configout->numweights)
+	if( config1->numweights != config2->numweights ||
+			config1->numweights != configout->numweights )
 	{
-		botimport.Print(PRT_ERROR, "cannot interbreed weight configs, unequal numweights\n");
+		botimport.Print( PRT_ERROR, "cannot interbreed weight configs, unequal numweights\n" );
 		return;
 	} //end if
-	for (i = 0; i < config1->numweights; i++)
+	for( i = 0; i < config1->numweights; i++ )
 	{
-		InterbreedFuzzySeperator_r(config1->weights[i].firstseperator,
+		InterbreedFuzzySeperator_r( config1->weights[i].firstseperator,
 									config2->weights[i].firstseperator,
-									configout->weights[i].firstseperator);
+									configout->weights[i].firstseperator );
 	} //end for
 } //end of the function InterbreedWeightConfigs
 //===========================================================================
@@ -909,15 +1204,15 @@ void InterbreedWeightConfigs(weightconfig_t *config1, weightconfig_t *config2,
 // Returns:				-
 // Changes Globals:		-
 //===========================================================================
-void BotShutdownWeights(void)
+void BotShutdownWeights( void )
 {
 	int i;
 
 	for( i = 0; i < MAX_WEIGHT_FILES; i++ )
 	{
-		if (weightFileList[i])
+		if( weightFileList[i] )
 		{
-			FreeWeightConfig2(weightFileList[i]);
+			FreeWeightConfig2( weightFileList[i] );
 			weightFileList[i] = NULL;
 		} //end if
 	} //end for

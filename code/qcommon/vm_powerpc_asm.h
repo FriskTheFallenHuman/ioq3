@@ -129,7 +129,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 	END{print "\t$l\n"}' < vm_powerpc_asm.c
  */
 
-typedef enum powerpc_iname {
+typedef enum powerpc_iname
+{
 	iCMPLWI, iCMPWI, iCMPW, iCMPLW, iFCMPU, iLI, iLIS, iADDI, iADDIS,
 	iBLTm, iBC, iBCL, iB, iBL, iBLR, iBCTR, iBCTRL, iRLWINM, iNOP, iORI,
 	iXORIS, iLDX, iLWZX, iSLW, iAND, iSUB, iLBZX, iNEG, iNOT, iSTWX, iSTBX,
@@ -144,7 +145,7 @@ typedef enum powerpc_iname {
 typedef uint32_t ppc_instruction_t;
 
 extern ppc_instruction_t
-asm_instruction( powerpc_iname_t, const int, const long int * );
+asm_instruction( powerpc_iname_t, const int, const long int* );
 
 #define IN( inst, args... ) \
 ({\
