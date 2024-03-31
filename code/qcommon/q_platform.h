@@ -69,28 +69,28 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 	// so set it in code instead
 	#ifdef _MSC_VER
 
-	#ifdef ARCH_STRING
-	  #undef ARCH_STRING
-	#endif // ARCH_STRING
+		#ifdef ARCH_STRING
+			#undef ARCH_STRING
+		#endif // ARCH_STRING
 
-	#ifdef _M_X64
-	  // this matches AMD64 and ARM64EC (but not regular ARM64), but they're supposed to be binary-compatible somehow, so whatever
-	  #define ARCH_STRING "x86_64"
-	#elif defined( _M_ARM64 )
-	  #define ARCH_STRING "arm64"
-	#elif defined( _M_ARM )
-	  #define ARCH_STRING "arm"
-	#elif defined( _M_IX86 )
-	  #define ARCH_STRING "x86"
-	#else
-	  // if you're not targeting one of the aforementioned architectures,
-	  // check https://learn.microsoft.com/en-us/cpp/preprocessor/predefined-macros
-	  // to find out how to detect yours and add it here - and please send a patch :)
-	  #error "Unknown CPU architecture!"
-	  // (for a quick and dirty solution, comment out the previous line, but keep in mind
-	  //  that things may get broken!)
-	  #define ARCH_STRING "UNKNOWN"
-	#endif // _M_X64 etc
+		#ifdef _M_X64
+			// this matches AMD64 and ARM64EC (but not regular ARM64), but they're supposed to be binary-compatible somehow, so whatever
+			#define ARCH_STRING "x86_64"
+		#elif defined( _M_ARM64 )
+			#define ARCH_STRING "arm64"
+		#elif defined( _M_ARM )
+			#define ARCH_STRING "arm"
+		#elif defined( _M_IX86 )
+			#define ARCH_STRING "x86"
+		#else
+			// if you're not targeting one of the aforementioned architectures,
+			// check https://learn.microsoft.com/en-us/cpp/preprocessor/predefined-macros
+			// to find out how to detect yours and add it here - and please send a patch :)
+			#error "Unknown CPU architecture!"
+			// (for a quick and dirty solution, comment out the previous line, but keep in mind
+			//  that things may get broken!)
+			#define ARCH_STRING "UNKNOWN"
+		#endif // _M_X64 etc
 
 	#endif // _MSC_VER
 

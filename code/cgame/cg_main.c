@@ -202,6 +202,9 @@ vmCvar_t	cg_trueLightning;
 	vmCvar_t	cg_obeliskRespawnDelay;
 #endif
 
+vmCvar_t cg_coronafardist;
+vmCvar_t cg_coronas;
+
 typedef struct
 {
 	vmCvar_t*	vmCvar;
@@ -270,6 +273,8 @@ static cvarTable_t cvarTable[] =
 	{ &cg_teamChatHeight, "cg_teamChatHeight", "0", CVAR_ARCHIVE  },
 	{ &cg_forceModel, "cg_forceModel", "0", CVAR_ARCHIVE  },
 	{ &cg_predictItems, "cg_predictItems", "1", CVAR_ARCHIVE },
+	{ &cg_coronafardist, "cg_coronafardist", "1536", CVAR_ARCHIVE },
+	{ &cg_coronas, "cg_coronas", "1", CVAR_ARCHIVE },
 #ifdef MISSIONPACK
 	{ &cg_deferPlayers, "cg_deferPlayers", "0", CVAR_ARCHIVE },
 #else
@@ -2187,8 +2192,8 @@ void CG_Shutdown( void )
 CG_EventHandling
 ==================
  type 0 - no event handling
-      1 - team menu
-      2 - hud editor
+	  1 - team menu
+	  2 - hud editor
 
 */
 #ifndef MISSIONPACK

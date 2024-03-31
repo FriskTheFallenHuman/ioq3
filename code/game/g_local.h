@@ -176,6 +176,8 @@ struct gentity_s
 	float		random;
 
 	gitem_t*		item;			// for bonus items
+
+	vec4_t dl_color;
 };
 
 

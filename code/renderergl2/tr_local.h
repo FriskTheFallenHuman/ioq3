@@ -748,6 +748,17 @@ typedef struct shaderProgram_s
 	char*  uniformBuffer;
 } shaderProgram_t;
 
+typedef struct corona_s
+{
+	vec3_t origin;
+	vec3_t color;               // range from 0.0 to 1.0, should be color normalized
+	vec3_t transformed;         // origin in local coordinate system
+	float scale;                // uses r_flaresize as the baseline (1.0)
+	int id;
+	int flags;                  // '1' is 'visible'
+	qboolean	visible;	// still send the corona request, even if not visible, for proper fading
+} corona_t;
+
 // trRefdef_t holds everything that comes in refdef_t,
 // as well as the locally generated scene information
 typedef struct
@@ -784,6 +795,9 @@ typedef struct
 
 	int			numDrawSurfs;
 	struct drawSurf_s*	drawSurfs;
+
+	int num_coronas;
+	struct corona_s* coronas;
 
 	unsigned int dlightMask;
 	int         num_pshadows;
@@ -1374,7 +1388,7 @@ the bits are allocated as follows:
 7-16  : entity index
 17-30 : sorted shader index
 
-    SmileTheory - for pshadows
+	SmileTheory - for pshadows
 17-31 : sorted shader index
 7-16  : entity index
 2-6   : fog index
@@ -2315,6 +2329,7 @@ void RE_AddLightToScene( const vec3_t org, float intensity, float r, float g, fl
 void RE_AddAdditiveLightToScene( const vec3_t org, float intensity, float r, float g, float b );
 void RE_BeginScene( const refdef_t* fd );
 void RE_RenderScene( const refdef_t* fd );
+void RE_AddCoronaToScene( const vec3_t org, float r, float g, float b, float scale, int id, int flags );
 void RE_EndScene( void );
 
 /*
@@ -2539,6 +2554,7 @@ typedef struct
 	trRefEntity_t	entities[MAX_REFENTITIES];
 	srfPoly_t*	polys;//[MAX_POLYS];
 	polyVert_t*	polyVerts;//[MAX_POLYVERTS];
+	corona_t coronas[MAX_CORONAS]; //----(SA)
 	pshadow_t pshadows[MAX_CALC_PSHADOWS];
 	renderCommandList_t	commands;
 } backEndData_t;

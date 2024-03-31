@@ -24,6 +24,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 int			r_firstSceneDrawSurf;
 
+int			r_numcoronas;
+int			r_firstSceneCorona;
+
 int			r_numdlights;
 int			r_firstSceneDlight;
 
@@ -51,6 +54,9 @@ void R_InitNextFrame( void )
 	r_numdlights = 0;
 	r_firstSceneDlight = 0;
 
+	r_numcoronas = 0;
+	r_firstSceneCorona = 0;
+
 	r_numentities = 0;
 	r_firstSceneEntity = 0;
 
@@ -70,6 +76,7 @@ RE_ClearScene
 void RE_ClearScene( void )
 {
 	r_firstSceneDlight = r_numdlights;
+	r_firstSceneCorona = r_numcoronas;
 	r_firstSceneEntity = r_numentities;
 	r_firstScenePoly = r_numpolys;
 }
@@ -314,6 +321,33 @@ void RE_AddAdditiveLightToScene( const vec3_t org, float intensity, float r, flo
 	RE_AddDynamicLightToScene( org, intensity, r, g, b, qtrue );
 }
 
+/*
+==============
+RE_AddCoronaToScene
+==============
+*/
+void RE_AddCoronaToScene( const vec3_t org, float r, float g, float b, float scale, int id, int flags )
+{
+	corona_t* cor;
+
+	if( !tr.registered )
+	{
+		return;
+	}
+	if( r_numcoronas >= MAX_CORONAS )
+	{
+		return;
+	}
+
+	cor = &backEndData->coronas[r_numcoronas++];
+	VectorCopy( org, cor->origin );
+	cor->color[0] = r;
+	cor->color[1] = g;
+	cor->color[2] = b;
+	cor->scale = scale;
+	cor->id = id;
+	cor->flags = flags;
+}
 
 void RE_BeginScene( const refdef_t* fd )
 {
@@ -454,6 +488,9 @@ void RE_BeginScene( const refdef_t* fd )
 
 	tr.refdef.num_dlights = r_numdlights - r_firstSceneDlight;
 	tr.refdef.dlights = &backEndData->dlights[r_firstSceneDlight];
+
+	tr.refdef.num_coronas = r_numcoronas - r_firstSceneCorona;
+	tr.refdef.coronas = &backEndData->coronas[r_firstSceneCorona];
 
 	tr.refdef.numPolys = r_numpolys - r_firstScenePoly;
 	tr.refdef.polys = &backEndData->polys[r_firstScenePoly];

@@ -101,6 +101,7 @@ field_t fields[] =
 {
 	{"classname", FOFS( classname ), F_STRING},
 	{"origin", FOFS( s.origin ), F_VECTOR},
+	{"color", FOFS( dl_color ), F_VECTOR},
 	{"model", FOFS( model ), F_STRING},
 	{"model2", FOFS( model2 ), F_STRING},
 	{"spawnflags", FOFS( spawnflags ), F_INT},
@@ -190,6 +191,7 @@ void SP_team_CTF_bluespawn( gentity_t* ent );
 	void SP_team_neutralobelisk( gentity_t* ent );
 #endif
 void SP_item_botroam( gentity_t* ent ) { }
+void SP_corona( gentity_t* ent );
 
 spawn_t	spawns[] =
 {
@@ -242,6 +244,7 @@ spawn_t	spawns[] =
 
 	{"light", SP_light},
 	{"path_corner", SP_path_corner},
+	{"corona", SP_corona},
 
 	{"misc_teleporter_dest", SP_misc_teleporter_dest},
 	{"misc_model", SP_misc_model},

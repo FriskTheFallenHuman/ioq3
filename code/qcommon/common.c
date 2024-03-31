@@ -100,13 +100,13 @@ cvar_t*	com_busyWait;
 #endif
 
 #ifndef _WINDOWS
-#if idx64
-	int ( *Q_VMftol )( void );
-#elif id386
-	long ( QDECL* Q_ftol )( float f );
-	int ( QDECL* Q_VMftol )( void );
-	void ( QDECL* Q_SnapVector )( vec3_t vec );
-#endif
+	#if idx64
+		int ( *Q_VMftol )( void );
+	#elif id386
+		long ( QDECL* Q_ftol )( float f );
+		int ( QDECL* Q_VMftol )( void );
+		void ( QDECL* Q_SnapVector )( vec3_t vec );
+	#endif
 #endif // _WINDOWS
 
 // com_speeds times

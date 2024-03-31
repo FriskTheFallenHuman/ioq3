@@ -78,6 +78,8 @@ typedef struct
 	void	( *DrawStretchRaw )( int x, int y, int w, int h, int cols, int rows, const byte* data, int client, qboolean dirty );
 	void	( *UploadCinematic )( int w, int h, int cols, int rows, const byte* data, int client, qboolean dirty );
 
+	void ( *AddCoronaToScene )( const vec3_t org, float r, float g, float b, float scale, int id, int flags );
+
 	void	( *BeginFrame )( stereoFrame_t stereoFrame );
 
 	// if the pointers are not NULL, timing info will be returned
