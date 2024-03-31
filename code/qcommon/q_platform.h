@@ -65,9 +65,38 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 	#define QDECL
 	#define QCALL
 
-	//================================================================= WIN64/32 ===
+	// Setting D3_ARCH for VisualC++ from CMake doesn't work when using VS integrated CMake
+	// so set it in code instead
+	#ifdef _MSC_VER
 
-	#if defined(_WIN64) || defined(__WIN64__)
+	#ifdef ARCH_STRING
+	  #undef ARCH_STRING
+	#endif // ARCH_STRING
+
+	#ifdef _M_X64
+	  // this matches AMD64 and ARM64EC (but not regular ARM64), but they're supposed to be binary-compatible somehow, so whatever
+	  #define ARCH_STRING "x86_64"
+	#elif defined( _M_ARM64 )
+	  #define ARCH_STRING "arm64"
+	#elif defined( _M_ARM )
+	  #define ARCH_STRING "arm"
+	#elif defined( _M_IX86 )
+	  #define ARCH_STRING "x86"
+	#else
+	  // if you're not targeting one of the aforementioned architectures,
+	  // check https://learn.microsoft.com/en-us/cpp/preprocessor/predefined-macros
+	  // to find out how to detect yours and add it here - and please send a patch :)
+	  #error "Unknown CPU architecture!"
+	  // (for a quick and dirty solution, comment out the previous line, but keep in mind
+	  //  that things may get broken!)
+	  #define ARCH_STRING "UNKNOWN"
+	#endif // _M_X64 etc
+
+	#endif // _MSC_VER
+
+	//================== WIN64/WIN32 =======================//
+
+	#if defined( WIN64 ) || defined( _WIN64 )
 
 		#undef QDECL
 		#define QDECL __cdecl
@@ -75,26 +104,12 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 		#undef QCALL
 		#define QCALL __stdcall
 
-		#if defined( _MSC_VER )
-			#define OS_STRING "win_msvc64"
-		#elif defined __MINGW64__
-			#define OS_STRING "win_mingw64"
-		#endif
-
 		#define ID_INLINE __inline
 		#define PATH_SEP '\\'
 
-		#if defined( _WIN64 )
-			#define ARCH_STRING "x86_64"
-		#elif defined _M_ALPHA
-			#define ARCH_STRING "AXP"
-		#endif
-
 		#define Q3_LITTLE_ENDIAN
 
-		#define DLL_EXT ".dll"
-
-	#elif defined(_WIN32) || defined(__WIN32__)
+	#else
 
 		#undef QDECL
 		#define QDECL __cdecl
@@ -102,86 +117,51 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 		#undef QCALL
 		#define QCALL __stdcall
 
-		#if defined( _MSC_VER )
-			#define OS_STRING "win_msvc"
-		#elif defined __MINGW32__
-			#define OS_STRING "win_mingw"
-		#endif
-
 		#define ID_INLINE __inline
 		#define PATH_SEP '\\'
 
-		#if defined( _M_IX86 ) || defined( __i386__ )
-			#define ARCH_STRING "x86"
-		#elif defined _M_ALPHA
-			#define ARCH_STRING "AXP"
-		#endif
-
 		#define Q3_LITTLE_ENDIAN
-
-		#define DLL_EXT ".dll"
 
 	#endif
 
 
-	//============================================================== MAC OS X ===
+	//================ MAC OS X =========================//
 
-	#if defined(__APPLE__) || defined(__APPLE_CC__)
+	#if defined( MACOS_X ) || defined( __APPLE__ )
 
-		#define OS_STRING "macosx"
 		#define ID_INLINE inline
 		#define PATH_SEP '/'
 
 		#ifdef __ppc__
-			#define ARCH_STRING "ppc"
 			#define Q3_BIG_ENDIAN
 		#elif defined __i386__
-			#define ARCH_STRING "x86"
 			#define Q3_LITTLE_ENDIAN
 		#elif defined __x86_64__
-			#define ARCH_STRING "x86_64"
 			#define Q3_LITTLE_ENDIAN
 		#elif defined __aarch64__
-			#define ARCH_STRING "arm64"
 			#define Q3_LITTLE_ENDIAN
 			#ifndef NO_VM_COMPILED
 				#define NO_VM_COMPILED
 			#endif
 		#endif
 
-		#define DLL_EXT ".dylib"
-
 	#endif
 
-	//================================================================= LINUX ===
+	//========================= LINUX ====================//
 
-	#if defined(__linux__) || defined(__FreeBSD_kernel__) || defined(__GNU__)
+	#if defined( __linux__ ) || defined( __FreeBSD_kernel__ ) || defined( __GNU__ )
 
 		#include <endian.h>
-
-		#if defined(__linux__)
-			#define OS_STRING "linux"
-		#elif defined(__FreeBSD_kernel__)
-			#define OS_STRING "kFreeBSD"
-		#else
-			#define OS_STRING "GNU"
-		#endif
 
 		#define ID_INLINE inline
 
 		#define PATH_SEP '/'
-
-		#if !defined(ARCH_STRING)
-			# error ARCH_STRING should be defined by the Makefile
-		#endif
 
 		#if __FLOAT_WORD_ORDER == __BIG_ENDIAN
 			#define Q3_BIG_ENDIAN
 		#else
 			#define Q3_LITTLE_ENDIAN
 		#endif
-
-		#define DLL_EXT ".so"
 
 	#endif
 
@@ -196,32 +176,14 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 			#define __BSD__
 		#endif
 
-		#if defined(__FreeBSD__)
-			#define OS_STRING "freebsd"
-		#elif defined(__OpenBSD__)
-			#define OS_STRING "openbsd"
-		#elif defined(__NetBSD__)
-			#define OS_STRING "netbsd"
-		#endif
-
 		#define ID_INLINE inline
 		#define PATH_SEP '/'
-
-		#ifdef __i386__
-			#define ARCH_STRING "x86"
-		#elif defined __amd64__
-			#define ARCH_STRING "x86_64"
-		#elif defined __axp__
-			#define ARCH_STRING "alpha"
-		#endif
 
 		#if BYTE_ORDER == BIG_ENDIAN
 			#define Q3_BIG_ENDIAN
 		#else
 			#define Q3_LITTLE_ENDIAN
 		#endif
-
-		#define DLL_EXT ".so"
 
 	#endif
 
@@ -232,15 +194,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 		#include <stdint.h>
 		#include <sys/byteorder.h>
 
-		#define OS_STRING "solaris"
 		#define ID_INLINE inline
 		#define PATH_SEP '/'
-
-		#ifdef __i386__
-			#define ARCH_STRING "x86"
-		#elif defined __sparc
-			#define ARCH_STRING "sparc"
-		#endif
 
 		#if defined( _BIG_ENDIAN )
 			#define Q3_BIG_ENDIAN
@@ -248,23 +203,16 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 			#define Q3_LITTLE_ENDIAN
 		#endif
 
-		#define DLL_EXT ".so"
-
 	#endif
 
 	//================================================================== IRIX ===
 
 	#ifdef __sgi
 
-		#define OS_STRING "irix"
 		#define ID_INLINE __inline
 		#define PATH_SEP '/'
 
-		#define ARCH_STRING "mips"
-
 		#define Q3_BIG_ENDIAN // SGI's MIPS are always big endian
-
-		#define DLL_EXT ".so"
 
 	#endif
 
@@ -276,8 +224,10 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 		#define ID_INLINE
 		#define PATH_SEP '/'
 
+		#undef ARCH_STRING
 		#define ARCH_STRING "bytecode"
 
+		#undef DLL_EXT
 		#define DLL_EXT ".qvm"
 
 	#endif

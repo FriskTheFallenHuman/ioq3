@@ -20,11 +20,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
 
-#ifdef USE_LOCAL_HEADERS
-	#include "SDL.h"
-#else
-	#include <SDL.h>
-#endif
+#include <SDL.h>
 
 #include <stdarg.h>
 #include <stdio.h>
@@ -140,7 +136,7 @@ static void IN_PrintKey( const SDL_Keysym* keysym, keyNum_t key, qboolean down )
 IN_IsConsoleKey
 
 TODO: If the SDL_Scancode situation improves, use it instead of
-      both of these methods
+	  both of these methods
 ===============
 */
 static qboolean IN_IsConsoleKey( keyNum_t key, int character )
