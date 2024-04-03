@@ -1292,7 +1292,7 @@ static void RB_SurfaceFlare( srfFlare_t* surf )
 {
 	if( r_flares->integer )
 	{
-		RB_AddFlare( surf, tess.fogNum, surf->origin, surf->color, surf->normal );
+		RB_AddFlare( surf, tess.fogNum, surf->origin, surf->color, 1.0f, surf->normal, 0, qtrue );
 	}
 }
 
